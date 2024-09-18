@@ -2,12 +2,15 @@
 download-yaml:
 	./scripts/fetch_api.sh
 
-generate-client:
-	oapi-codegen -package=generate -generate=types -o=generate/generated-client.go   ./api.yaml
+
+
+
+TEMP_MAIN := temp_main.go
+GEN_FILE := scripts/generate.go
 
 generate-types:
-	ogen --target target/dir -package api --clean openapi.yaml
-
-	# swagger2openapi --yaml --outfile openapi.yaml https://dev.api.gateway.tech/swagger/doc.json
-
-
+	@echo "package main" > $(TEMP_MAIN)
+	@echo 'import "github.com/Gateway-DAO/gateway-go-sdk/scripts"' >> $(TEMP_MAIN)
+	@echo 'func main() { scripts.GenerateTypes() }' >> $(TEMP_MAIN)
+	go run $(TEMP_MAIN)
+	@rm -f $(TEMP_MAIN)
