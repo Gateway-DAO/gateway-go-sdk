@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
@@ -6,16 +6,14 @@ import (
 )
 
 type SDK struct {
-	DataAssets *dataassets.DataAssets
-	Client     *services.APIClient
+	DataAssets dataassets.DataAssets
 	APIKey     string
 }
 
 func NewSDK(apiKey string) *SDK {
 	client := services.NewAPIClient(apiKey)
 	return &SDK{
-		DataAssets: dataassets.New(client.Client, apiKey),
-		Client:     client,
+		DataAssets: dataassets.DataAssets{Client: client.Client, ApiKey: apiKey},
 		APIKey:     apiKey,
 	}
 }

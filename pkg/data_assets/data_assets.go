@@ -8,18 +8,11 @@ import (
 )
 
 type DataAssets struct {
-	client *http.Client
-	apiKey string
-}
-
-func New(client *http.Client, apiKey string) *DataAssets {
-	return &DataAssets{
-		client: client,
-		apiKey: apiKey,
-	}
+	Client *http.Client
+	ApiKey string
 }
 
 func (m *DataAssets) GetData(id string) (string, error) {
 
-	return services.MakeRequest(m.client, "GET", common.GetDataAssetByID, id)
+	return services.MakeRequest(m.Client, "GET", common.GetDataAssetByID, id)
 }
