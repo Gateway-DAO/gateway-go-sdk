@@ -1,139 +1,163 @@
 package common
 
-type ModelAccessLevel string
+import "github.com/go-resty/resty/v2"
+
+type MethodType string
 
 const (
-	Read ModelAccessLevel = "Read"
-	Write ModelAccessLevel = "Write"
+	PostMethod   MethodType = "POST"
+	GetMethod    MethodType = "GET"
+	PutDelete    MethodType = "PUT"
+	DeleteMethod MethodType = "DELETE"
 )
 
-type ModelTransactionType string
+type SDKConfig struct {
+	Client *resty.Client
+	ApiKey string
+}
 
-const (
-	TransactionTypeDeposit ModelTransactionType = "deposit"
-	TransactionTypeWithdrawal ModelTransactionType = "withdrawal"
-	TransactionTypePayment ModelTransactionType = "payment"
-	TransactionTypeFeePayment ModelTransactionType = "fee_payment"
-)
+type Error struct {
+	Error string
+}
 
 type HelperMeta struct {
-	TotalItems int `json:"total_items"`
-	TotalPages int `json:"total_pages"`
-	CurrentPage int `json:"current_page"`
 	ItemsPerPage int `json:"items_per_page"`
+	TotalItems   int `json:"total_items"`
+	TotalPages   int `json:"total_pages"`
+	CurrentPage  int `json:"current_page"`
 }
 
-type ModelAccountLedgerAddRequest struct {
-	Amount float64 `json:"amount"`
+type AccountUpdateRequest struct {
+	ProfilePicture string `json:"profile_picture"`
+	Username       string `json:"username"`
 }
 
-type ModelCreateDataAssetRequest struct {
-	Acl []interface{} `json:"acl"`
-	Claim map[string]interface{} `json:"claim"`
-	DataModelId int `json:"data_model_id"`
-	ExpirationDate string `json:"expiration_date"`
-	Name string `json:"name"`
-	Tags []interface{} `json:"tags"`
+type PublicDataAsset struct {
+	CreatedBy      string        `json:"created_by"`
+	ExpirationDate string        `json:"expiration_date"`
+	Fid            string        `json:"fid"`
+	Size           int           `json:"size"`
+	Type           string        `json:"type"`
+	Id             int           `json:"id"`
+	Name           string        `json:"name"`
+	UpdatedAt      string        `json:"updated_at"`
+	Acl            []interface{} `json:"acl"`
+	CreatedAt      string        `json:"created_at"`
+	DataModelId    int           `json:"data_model_id"`
+	Tags           []interface{} `json:"tags"`
+	TransactionId  string        `json:"transaction_id"`
 }
 
-type ModelMessageResponse struct {
+type ResponsesMessageResponse struct {
 	Message string `json:"message"`
 }
 
-type ModelPublicRole struct {
-	WalletAddress string `json:"wallet_address"`
-	CreatedAt string `json:"created_at"`
-	DataAssetId int `json:"data_asset_id"`
-	Role string `json:"role"`
-	UpdatedAt string `json:"updated_at"`
+type HelperPaginatedResponse[T any] struct {
+	Meta  HelperMeta  `json:"meta"`
+	Data  T           `json:"data"`
+	Links HelperLinks `json:"links"`
 }
 
-type ResponsesEntityRemovedResponse struct {
+type ACLRequest struct {
+	Address string        `json:"address"`
+	Roles   []interface{} `json:"roles"`
+}
+
+type AccessLevel string
+
+const (
+	RoleView   AccessLevel = "view"
+	RoleUpdate AccessLevel = "update"
+	RoleDelete AccessLevel = "delete"
+	RoleShare  AccessLevel = "share"
+)
+
+type CreateDataAssetRequest struct {
+	Acl            []interface{}          `json:"acl"`
+	Claim          map[string]interface{} `json:"claim"`
+	DataModelId    int                    `json:"data_model_id"`
+	ExpirationDate string                 `json:"expiration_date"`
+	Name           string                 `json:"name"`
+	Tags           []interface{}          `json:"tags"`
+}
+
+type PublicACL struct {
+	DataAssetId   int           `json:"data_asset_id"`
+	Roles         []interface{} `json:"roles"`
+	SolanaAddress string        `json:"solana_address"`
+	UpdatedAt     string        `json:"updated_at"`
+	Address       string        `json:"address"`
+	CreatedAt     string        `json:"created_at"`
+}
+
+type MyAccountResponse struct {
+	Did               string `json:"did"`
+	ProfilePicture    string `json:"profile_picture"`
+	StorageSize       int    `json:"storage_size"`
+	UpdatedAt         string `json:"updated_at"`
+	Username          string `json:"username"`
+	UsernameUpdatedAt string `json:"username_updated_at"`
+	WalletAddress     string `json:"wallet_address"`
+	CreatedAt         string `json:"created_at"`
+}
+
+type ShareDataAssetRequest struct {
+	Addresses []interface{} `json:"addresses"`
+}
+
+type TokenResponse struct {
+	Token string `json:"token"`
+}
+
+type UpdateDataAssetRequest struct {
+	Claim          map[string]interface{} `json:"claim"`
+	ExpirationDate string                 `json:"expiration_date"`
+	Name           string                 `json:"name"`
+}
+
+type DataModelRequest struct {
+	Description string                 `json:"description"`
+	Schema      map[string]interface{} `json:"schema"`
+	Tags        []interface{}          `json:"tags"`
+	Title       string                 `json:"title"`
+}
+
+type MessageResponse struct {
 	Message string `json:"message"`
 }
 
 type HelperLinks struct {
-	First string `json:"first"`
-	Last string `json:"last"`
-	Next string `json:"next"`
+	First    string `json:"first"`
+	Last     string `json:"last"`
+	Next     string `json:"next"`
 	Previous string `json:"previous"`
 }
 
-type HelperPaginatedResponse struct {
-	Data interface{} `json:"data"`
-	Links HelperLinks `json:"links"`
-	Meta HelperMeta `json:"meta"`
-}
-
-type ModelAccountCreateRequest struct {
-	Message string `json:"message"`
-	Signature string `json:"signature"`
-	Username string `json:"username"`
+type AccountCreateRequest struct {
+	Message       string `json:"message"`
+	Signature     string `json:"signature"`
+	Username      string `json:"username"`
 	WalletAddress string `json:"wallet_address"`
 }
 
-type ModelDataModel struct {
-	DeletedAt string `json:"deleted_at"`
-	Description string `json:"description"`
-	Id int `json:"id"`
-	Tags []interface{} `json:"tags"`
-	UpdatedAt string `json:"updated_at"`
-	CreatedAt string `json:"created_at"`
-	CreatedBy string `json:"created_by"`
-	Schema map[string]interface{} `json:"schema"`
-	Title string `json:"title"`
-}
-
-type ModelRoleRequest struct {
-	Role ModelAccessLevel `json:"role"`
-	Wallet string `json:"wallet"`
-}
-
-type ModelTokenResponse struct {
-	Token string `json:"token"`
-}
-
-type ModelAccountLedgerCreateResponse struct {
-	CreatedAt string `json:"createdAt"`
-	Id int `json:"id"`
-	TransactionType ModelTransactionType `json:"transaction_type"`
-	UpdatedAt string `json:"updatedAt"`
-	AccountId int `json:"account_id"`
-	Amount float64 `json:"amount"`
-	Balance float64 `json:"balance"`
-}
-
-type ModelAuthRequest struct {
-	Message string `json:"message"`
-	Signature string `json:"signature"`
+type AuthRequest struct {
+	Message       string `json:"message"`
+	Signature     string `json:"signature"`
 	WalletAddress string `json:"wallet_address"`
 }
 
-type ModelDataAssetIDRequestAndResponse struct {
+type DataAssetIDRequestAndResponse struct {
 	Id int `json:"id"`
 }
 
-type ModelMyAccountResponse struct {
-	CreatedAt string `json:"created_at"`
-	Did string `json:"did"`
-	ProfilePicture string `json:"profile_picture"`
-	UpdatedAt string `json:"updated_at"`
-	Username string `json:"username"`
-	WalletAddress string `json:"wallet_address"`
+type DataModel struct {
+	Id          int                    `json:"id"`
+	Schema      map[string]interface{} `json:"schema"`
+	Tags        []interface{}          `json:"tags"`
+	UpdatedAt   string                 `json:"updated_at"`
+	CreatedAt   string                 `json:"created_at"`
+	CreatedBy   string                 `json:"created_by"`
+	DeletedAt   string                 `json:"deleted_at"`
+	Description string                 `json:"description"`
+	Title       string                 `json:"title"`
 }
-
-type ModelPublicDataAsset struct {
-	ExpirationDate string `json:"expiration_date"`
-	Fid string `json:"fid"`
-	Issuer ModelMyAccountResponse `json:"issuer"`
-	Tags []interface{} `json:"tags"`
-	Type string `json:"type"`
-	CreatedAt string `json:"created_at"`
-	DataModelId int `json:"data_model_id"`
-	Name string `json:"name"`
-	Roles []interface{} `json:"roles"`
-	Size int `json:"size"`
-	TransactionId string `json:"transaction_id"`
-	UpdatedAt string `json:"updated_at"`
-}
-

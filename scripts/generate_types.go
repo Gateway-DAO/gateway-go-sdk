@@ -8,19 +8,31 @@ import (
 func extractGoTypes(schema SwaggerSchema) []string {
 	var goTypes []string
 
-	for defName, def := range schema.Definitions {
+	for defName, def := range schema.Components.Schemas {
 		if len(def.Enum) > 0 {
 			goTypes = append(goTypes, generateEnum(defName, def.Enum, def.XEnumVarnames))
 		} else if def.Type == "object" {
-			goTypes = append(goTypes, generateStruct(defName, def.Properties))
+			generatedObject := generateStruct(defName, def.Properties)
+			if defName == "helper.PaginatedResponse" {
+				generatedObject = addGenericsToStruct(generatedObject)
+			}
+			goTypes = append(goTypes, generatedObject)
 		}
 	}
 
 	return goTypes
 }
 
+func addGenericsToStruct(structDef string) string {
+	genericStruct := strings.ReplaceAll(structDef, "interface{}", "T")
+
+	genericStruct = strings.Replace(genericStruct, "struct {", "[T any] struct {", 1)
+
+	return genericStruct
+}
+
 func generateEnum(name string, enumValues []string, varNames []string) string {
-	typeName := toPascalCase(name)
+	typeName := ToPascalCase(name)
 	var lines []string
 	lines = append(lines, fmt.Sprintf("type %s string", typeName))
 	lines = append(lines, "")
@@ -31,7 +43,7 @@ func generateEnum(name string, enumValues []string, varNames []string) string {
 		if i < len(varNames) {
 			enumName = varNames[i]
 		} else {
-			enumName = fmt.Sprintf("%s%s", typeName, toPascalCase(value))
+			enumName = fmt.Sprintf("%s%s", typeName, ToPascalCase(value))
 		}
 		lines = append(lines, fmt.Sprintf("\t%s %s = \"%s\"", enumName, typeName, value))
 	}
@@ -42,11 +54,11 @@ func generateEnum(name string, enumValues []string, varNames []string) string {
 
 func generateStruct(name string, properties map[string]SwaggerType) string {
 	var fields []string
-	fields = append(fields, fmt.Sprintf("type %s struct {", toPascalCase(name)))
+	fields = append(fields, fmt.Sprintf("type %s struct {", ToPascalCase(name)))
 
 	for propName, propSchema := range properties {
 		goType := getGoType(propSchema)
-		fields = append(fields, fmt.Sprintf("\t%s %s `json:\"%s\"`", toPascalCase(propName), goType, propName))
+		fields = append(fields, fmt.Sprintf("\t%s %s `json:\"%s\"`", ToPascalCase(propName), goType, propName))
 	}
 
 	fields = append(fields, "}")
@@ -56,7 +68,7 @@ func generateStruct(name string, properties map[string]SwaggerType) string {
 func getGoType(schema SwaggerType) string {
 	if schema.Ref != "" {
 		parts := strings.Split(schema.Ref, "/")
-		return toPascalCase(parts[len(parts)-1])
+		return ToPascalCase(parts[len(parts)-1])
 	}
 
 	switch schema.Type {

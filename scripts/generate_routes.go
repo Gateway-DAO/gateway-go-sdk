@@ -14,8 +14,8 @@ func GenerateRouteConstants(paths map[string]PathItem) string {
 	for path, pathItem := range paths {
 		for method, operation := range pathItem {
 			constantName := generateRouteConstantName(method, path, operation.Summary)
-			parameterizedPath := parameterizePath(path)
-			constants = append(constants, fmt.Sprintf("\t%s = \"%s\"", constantName, parameterizedPath))
+			// parameterizedPath := parameterizePath(path)
+			constants = append(constants, fmt.Sprintf("\t%s = \"%s\"", constantName, path))
 		}
 	}
 
@@ -28,7 +28,7 @@ func generateRouteConstantName(method, path, summary string) string {
 	if name == "" {
 		name = path
 	}
-	return toPascalCase(name)
+	return ToPascalCase(name)
 }
 
 func parameterizePath(path string) string {
@@ -36,7 +36,9 @@ func parameterizePath(path string) string {
 	return re.ReplaceAllString(path, "%s")
 }
 
-func toPascalCase(s string) string {
+func ToPascalCase(s string) string {
+	s = strings.TrimPrefix(s, "model.")
+
 	var sb strings.Builder
 	uppercaseNext := true
 

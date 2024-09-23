@@ -8,12 +8,14 @@ import (
 )
 
 type SwaggerSchema struct {
-	Definitions map[string]struct {
-		Type          string                 `json:"type"`
-		Properties    map[string]SwaggerType `json:"properties"`
-		Enum          []string               `json:"enum"`
-		XEnumVarnames []string               `json:"x-enum-varnames"`
-	} `json:"definitions"`
+	Components struct {
+		Schemas map[string]struct {
+			Type          string                 `json:"type"`
+			Properties    map[string]SwaggerType `json:"properties"`
+			Enum          []string               `json:"enum"`
+			XEnumVarnames []string               `json:"x-enum-varnames"`
+		} `json:"schemas"`
+	} `json:"components"`
 	Paths map[string]PathItem `json:"paths"`
 }
 
@@ -47,7 +49,22 @@ func GenerateTypes() {
 
 	routeConstants := GenerateRouteConstants(schema.Paths)
 
-	outputTypes := "package common\n\n" + strings.Join(goTypes, "\n\n") + "\n\n"
+	outputTypes := "package common\n\n" + `import "github.com/go-resty/resty/v2"` + "\n\n" + `type MethodType string
+	const (
+		PostMethod   MethodType = "POST"
+		GetMethod    MethodType = "GET"
+		PutDelete    MethodType = "PUT"
+		DeleteMethod MethodType = "DELETE"
+	)` + "\n\n" + `
+		type SDKConfig struct {
+		Client *resty.Client
+		ApiKey string
+	}
+	` + "\n \n" + `
+		type Error struct {
+		Error string 
+		}
+	` + "\n\n" + strings.Join(goTypes, "\n\n") + "\n\n"
 	err = os.WriteFile("pkg/common/types.go", []byte(outputTypes), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)

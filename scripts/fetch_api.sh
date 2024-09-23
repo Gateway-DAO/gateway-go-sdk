@@ -1,8 +1,7 @@
 #!/bin/bash
 
-URL="https://dev.api.gateway.tech/swagger/doc.json"
+URL="https://dev.api.gateway.tech/docs/openapi3_full.json"
 FILE="api.json"
 
-# Download the OpenAPI spec
 curl -o $FILE $URL
 
