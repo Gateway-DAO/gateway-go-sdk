@@ -16,19 +16,17 @@ type FileResponse struct {
 	FileType    string
 }
 
-// check all interfaces with swagger again
 type DataAsset interface {
-	CreateClaimDataAsset(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
-	CreateFileDataAsset(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
-	GetMyDataAssets() (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
-	GetDataAssetByID(id int64) (common.PublicDataAsset, error)
-	UpdateClaimDataAsset(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
-	UpdateFileDataAsset(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
-	DeleteDataAssetById(id int64) (common.MessageResponse, error)
-	AssignACLToDataAsset(id int64, aclList []common.ACLRequest) (common.PublicACL, error)
-	UpdateACLToDataAsset(id int64, aclList []common.ACLRequest) (common.PublicACL, error)
-	DownloadDataAssetById(id int64) (*FileResponse, error)
-	ShareDataAssetById(id int64, shareDetails []common.ShareDataAssetRequest) ([]common.PublicACL, error)
+	CreateStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
+	CreateNonStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
+	GetCreatedByMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
+	GetReceivedToMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
+	GetDetail(id int64) (common.PublicDataAsset, error)
+	UpdateStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
+	UpdateNonStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
+	DeleteAsset(id int64) (common.MessageResponse, error)
+	Download(id int64) (*FileResponse, error)
+	Share(id int64, shareDetails []common.ShareDataAssetRequest) ([]common.PublicACL, error)
 }
 
 type DataAssetImpl struct {
@@ -41,27 +39,89 @@ func NewDataAssetImpl(config common.SDKConfig) *DataAssetImpl {
 	}
 }
 
-// check for not initiaized values
-func (u *DataAssetImpl) GetDataAssetByID(id int64) (common.PublicDataAsset, error) {
+func (u *DataAssetImpl) GetDetail(id int64) (common.PublicDataAsset, error) {
 	var asset common.PublicDataAsset
 	var error common.Error
 
-	res, err := u.Config.Client.R().SetPathParams(map[string]string{
-		"id": fmt.Sprintf("%d", id),
-	}).SetResult(&asset).SetError(&error).Get(common.GetDataAssetByID)
+	res, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%d", id)).SetResult(&asset).SetError(&error).Get(common.GetDataAssetByID)
 
 	if err != nil {
-		return common.PublicDataAsset{}, err
+		return asset, err
 	}
 
 	if res.IsError() {
-		return common.PublicDataAsset{}, errors.New(error.Error)
+		return asset, errors.New(error.Error)
 	}
 
 	return asset, nil
 }
 
-func (u *DataAssetImpl) DownloadDataAssetById(id int64) (*FileResponse, error) {
+func (u *DataAssetImpl) GetCreatedByMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error) {
+
+	var assets common.HelperPaginatedResponse[[]common.PublicDataAsset]
+	var error common.Error
+
+	res, err := u.Config.Client.R().SetQueryParams(map[string]string{
+		"page":      fmt.Sprintf("%d", page),
+		"page_size": fmt.Sprintf("%d", page_size),
+	}).SetResult(&assets).SetError(&error).Get(common.GetCreatedDataAssets)
+
+	if err != nil {
+		return assets, err
+	}
+
+	if res.IsError() {
+		return assets, errors.New(error.Error)
+	}
+
+	return assets, nil
+}
+
+func (u *DataAssetImpl) GetReceivedToMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error) {
+	var assets common.HelperPaginatedResponse[[]common.PublicDataAsset]
+	var error common.Error
+
+	res, err := u.Config.Client.R().SetQueryParams(map[string]string{
+		"page":      fmt.Sprintf("%d", page),
+		"page_size": fmt.Sprintf("%d", page_size),
+	}).SetResult(&assets).SetError(&error).Get(common.GetReceivedDataAssets)
+
+	if err != nil {
+		return assets, err
+	}
+
+	if res.IsError() {
+		return assets, errors.New(error.Error)
+	}
+
+	return assets, nil
+}
+
+func (u *DataAssetImpl) CreateStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error) {
+
+}
+
+func (u *DataAssetImpl) CreateNonStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error) {
+
+}
+
+func (u *DataAssetImpl) UpdateStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error) {
+
+}
+
+func (u *DataAssetImpl) UpdateNonStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error) {
+
+}
+
+func (u *DataAssetImpl) DeleteAsset(id int64) (common.MessageResponse, error) {
+
+}
+
+func (u *DataAssetImpl) Share(id int64, shareDetails []common.ShareDataAssetRequest) ([]common.PublicACL, error) {
+
+}
+
+func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
 	resp, err := u.Config.Client.R().
 		SetOutput("temporary-file").
 		Get(common.DownloadDataAssetByID)

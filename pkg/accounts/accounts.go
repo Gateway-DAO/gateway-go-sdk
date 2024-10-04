@@ -7,26 +7,30 @@ import (
 )
 
 type Accounts interface {
-	CreateAccount(accountDetails common.AccountCreateRequest) (string, error)
-	Me() (common.MyAccountResponse, error)
-	UpdateAccount(updateDetails common.AccountUpdateRequest) (common.MyAccountResponse, error)
+	Create(accountDetails common.AccountCreateRequest) (string, error)
+	GetMe() (common.MyAccountResponse, error)
+	UpdateMe(updateDetails common.AccountUpdateRequest) (common.MyAccountResponse, error)
+
+	GetWallet() WalletInterface
 }
 
 type AccountsImpl struct {
-	Config common.SDKConfig
+	Config        common.SDKConfig
+	WalletMethods WalletInterface
 }
 
 func NewAccountsImpl(config common.SDKConfig) *AccountsImpl {
 	return &AccountsImpl{
-		Config: config,
+		Config:        config,
+		WalletMethods: NewWalletImpl(config),
 	}
 }
 
-func (u *AccountsImpl) CreateAccount(accountDetails common.AccountCreateRequest) (string, error) {
-	var jwtTokenResponse common.TokenResponse = common.TokenResponse{Token: ""}
+func (u *AccountsImpl) Create(accountDetails common.AccountCreateRequest) (string, error) {
+	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 
-	res, err := u.Config.Client.R().SetBody(accountDetails).SetResult(&jwtTokenResponse).SetError(&error).Post(common.CreateAccount)
+	res, err := u.Config.Client.R().SetBody(&accountDetails).SetResult(&jwtTokenResponse).SetError(&error).Post(common.CreateAccount)
 
 	if err != nil {
 		return jwtTokenResponse.Token, err
@@ -39,7 +43,7 @@ func (u *AccountsImpl) CreateAccount(accountDetails common.AccountCreateRequest)
 	return jwtTokenResponse.Token, nil
 }
 
-func (u *AccountsImpl) Me() (common.MyAccountResponse, error) {
+func (u *AccountsImpl) GetMe() (common.MyAccountResponse, error) {
 	var myAccountResponse common.MyAccountResponse
 	var error common.Error
 
@@ -57,11 +61,11 @@ func (u *AccountsImpl) Me() (common.MyAccountResponse, error) {
 
 }
 
-func (u *AccountsImpl) UpdateAccount(updateDetails common.AccountUpdateRequest) (common.MyAccountResponse, error) {
+func (u *AccountsImpl) UpdateMe(updateDetails common.AccountUpdateRequest) (common.MyAccountResponse, error) {
 	var myAccountResponse common.MyAccountResponse
 	var error common.Error
 
-	res, err := u.Config.Client.R().SetBody(updateDetails).SetResult(&myAccountResponse).SetError(&error).Patch(common.GetMyAccount)
+	res, err := u.Config.Client.R().SetBody(&updateDetails).SetResult(&myAccountResponse).SetError(&error).Patch(common.GetMyAccount)
 
 	if err != nil {
 		return myAccountResponse, err
@@ -72,4 +76,8 @@ func (u *AccountsImpl) UpdateAccount(updateDetails common.AccountUpdateRequest) 
 	}
 
 	return myAccountResponse, nil
+}
+
+func (a *AccountsImpl) GetWallet() WalletInterface {
+	return a.WalletMethods
 }

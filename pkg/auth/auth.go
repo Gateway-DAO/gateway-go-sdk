@@ -8,8 +8,8 @@ import (
 
 type Auth interface {
 	Login(message string, signature string, wallet_address string) (string, error)
-	GenerateSignMessage() (string, error)
-	RefreshToken() (string, error)
+	GetMessage() (string, error)
+	GetRefreshToken() (string, error)
 }
 
 type AuthImpl struct {
@@ -41,7 +41,7 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 	return jwtTokenResponse.Token, nil
 }
 
-func (u *AuthImpl) GenerateSignMessage() (string, error) {
+func (u *AuthImpl) GetMessage() (string, error) {
 
 	var messageResponse common.MessageResponse = common.MessageResponse{Message: ""}
 	var error common.Error
@@ -59,7 +59,7 @@ func (u *AuthImpl) GenerateSignMessage() (string, error) {
 	return messageResponse.Message, nil
 }
 
-func (u *AuthImpl) RefreshToken() (string, error) {
+func (u *AuthImpl) GetRefreshToken() (string, error) {
 
 	var jwtTokenResponse common.TokenResponse = common.TokenResponse{Token: ""}
 	var error common.Error
