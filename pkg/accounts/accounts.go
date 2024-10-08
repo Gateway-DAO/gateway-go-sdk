@@ -10,19 +10,18 @@ type Accounts interface {
 	Create(accountDetails common.AccountCreateRequest) (string, error)
 	GetMe() (common.MyAccountResponse, error)
 	UpdateMe(updateDetails common.AccountUpdateRequest) (common.MyAccountResponse, error)
-
-	GetWallet() WalletInterface
 }
 
 type AccountsImpl struct {
-	Config        common.SDKConfig
-	WalletMethods WalletInterface
+	Config common.SDKConfig
+	Wallet WalletInterface
 }
 
 func NewAccountsImpl(config common.SDKConfig) *AccountsImpl {
+	wallet := NewWalletImpl(config)
 	return &AccountsImpl{
-		Config:        config,
-		WalletMethods: NewWalletImpl(config),
+		Config: config,
+		Wallet: wallet,
 	}
 }
 
@@ -76,8 +75,4 @@ func (u *AccountsImpl) UpdateMe(updateDetails common.AccountUpdateRequest) (comm
 	}
 
 	return myAccountResponse, nil
-}
-
-func (a *AccountsImpl) GetWallet() WalletInterface {
-	return a.WalletMethods
 }

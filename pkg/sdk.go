@@ -12,7 +12,7 @@ import (
 type SDK struct {
 	DataAssets dataassets.DataAsset
 	DataModel  datamodels.DataModel
-	Account    accounts.Accounts
+	Account    *accounts.AccountsImpl
 	Auth       auth.Auth
 	APIKey     string
 }
