@@ -22,10 +22,9 @@ func NewAuthImpl(config common.SDKConfig) *AuthImpl {
 	}
 }
 
-// check here for jwt response && walletAddress
 func (u *AuthImpl) Login(message string, signature string, wallet_address string) (string, error) {
 
-	var jwtTokenResponse common.TokenResponse = common.TokenResponse{Token: ""}
+	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetBody(&common.AuthRequest{Message: message, Signature: signature, WalletAddress: wallet_address}).SetResult(&jwtTokenResponse).SetError(&error).Post(common.AuthenticateAccount)
@@ -43,7 +42,7 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 
 func (u *AuthImpl) GetMessage() (string, error) {
 
-	var messageResponse common.MessageResponse = common.MessageResponse{Message: ""}
+	var messageResponse common.MessageResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetResult(&messageResponse).SetError(&error).Get(common.GenerateSignMessage)
@@ -61,7 +60,7 @@ func (u *AuthImpl) GetMessage() (string, error) {
 
 func (u *AuthImpl) GetRefreshToken() (string, error) {
 
-	var jwtTokenResponse common.TokenResponse = common.TokenResponse{Token: ""}
+	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetResult(&jwtTokenResponse).SetError(&error).Get(common.RefreshToken)

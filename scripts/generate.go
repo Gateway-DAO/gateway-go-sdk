@@ -50,12 +50,10 @@ func GenerateTypes() {
 	routeConstants := GenerateRouteConstants(schema.Paths)
 
 	outputTypes := "package common\n\n" + `import "github.com/go-resty/resty/v2"` + "\n\n" + `type MethodType string
-	const (
-		PostMethod   MethodType = "POST"
-		GetMethod    MethodType = "GET"
-		PutDelete    MethodType = "PUT"
-		DeleteMethod MethodType = "DELETE"
-	)` + "\n\n" + `
+	type WalletSignMessageType struct {
+	Signature  []byte
+	SigningKey string
+}` + "\n\n" + `
 		type SDKConfig struct {
 		Client *resty.Client
 		ApiKey string

@@ -14,4 +14,7 @@ generate-types:
 format:
 	go fmt ./...
 
+test:
+	go test ./... -v -cover
+
 .PHONY: generate-types format

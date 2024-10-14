@@ -1,11 +1,14 @@
 package dataassets
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"mime"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
@@ -17,13 +20,13 @@ type FileResponse struct {
 }
 
 type DataAsset interface {
-	CreateStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
-	CreateNonStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
+	Upload(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error)
+	UploadFile(fileName string, fileContent []byte, aclList *[]common.ACLRequest, expirationDate *time.Time) (common.DataAssetIDRequestAndResponse, error)
 	GetCreatedByMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
-	GetReceivedToMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
-	GetDetail(id int64) (common.PublicDataAsset, error)
-	UpdateStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
-	UpdateNonStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
+	GetReceivedByMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error)
+	Get(id int64) (common.PublicDataAsset, error)
+	UpdateAsset(id string, dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error)
+	UpdateFile(id string, fileName string, fileContent []byte, aclList *[]common.ACLRequest, expirationDate *time.Time) (common.PublicDataAsset, error)
 	DeleteAsset(id int64) (common.MessageResponse, error)
 	Download(id int64) (*FileResponse, error)
 	Share(id int64, shareDetails []common.ShareDataAssetRequest) ([]common.PublicACL, error)
@@ -39,7 +42,7 @@ func NewDataAssetImpl(config common.SDKConfig) *DataAssetImpl {
 	}
 }
 
-func (u *DataAssetImpl) GetDetail(id int64) (common.PublicDataAsset, error) {
+func (u *DataAssetImpl) Get(id int64) (common.PublicDataAsset, error) {
 	var asset common.PublicDataAsset
 	var error common.Error
 
@@ -77,7 +80,7 @@ func (u *DataAssetImpl) GetCreatedByMe(page int, page_size int) (common.HelperPa
 	return assets, nil
 }
 
-func (u *DataAssetImpl) GetReceivedToMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error) {
+func (u *DataAssetImpl) GetReceivedByMe(page int, page_size int) (common.HelperPaginatedResponse[[]common.PublicDataAsset], error) {
 	var assets common.HelperPaginatedResponse[[]common.PublicDataAsset]
 	var error common.Error
 
@@ -97,28 +100,152 @@ func (u *DataAssetImpl) GetReceivedToMe(page int, page_size int) (common.HelperP
 	return assets, nil
 }
 
-func (u *DataAssetImpl) CreateStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error) {
+func (u *DataAssetImpl) Upload(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error) {
+	var id common.DataAssetIDRequestAndResponse
+	var error common.Error
 
+	res, err := u.Config.Client.R().SetBody(&dataAssetInput).SetResult(&id).SetError(&error).Post(common.CreateANewDataAsset)
+
+	if err != nil {
+		return id, err
+	}
+
+	if res.IsError() {
+		return id, errors.New(error.Error)
+	}
+
+	return id, nil
 }
 
-func (u *DataAssetImpl) CreateNonStructured(dataAssetInput common.CreateDataAssetRequest) (common.DataAssetIDRequestAndResponse, error) {
-
+func toRFC3339(t time.Time) string {
+	return t.Format(time.RFC3339)
 }
 
-func (u *DataAssetImpl) UpdateStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error) {
+func (u *DataAssetImpl) UploadFile(fileName string, fileContent []byte, aclList *[]common.ACLRequest, expirationDate *time.Time) (common.DataAssetIDRequestAndResponse, error) {
+	var id common.DataAssetIDRequestAndResponse
+	var error common.Error
 
+	formData := make(map[string]string)
+
+	if aclList != nil {
+		aclJSON, err := json.Marshal(aclList)
+		if err != nil {
+			return id, err
+		}
+		formData["acl"] = string(aclJSON)
+	}
+
+	if expirationDate != nil {
+		formData["expiration_date"] = toRFC3339(*expirationDate)
+	}
+
+	req := u.Config.Client.R().SetFileReader("data", fileName, bytes.NewReader(fileContent))
+
+	if len(formData) > 0 {
+		req = req.SetFormData(formData)
+	}
+
+	res, err := req.SetResult(&id).SetError(&error).Post(common.CreateANewDataAsset)
+
+	if err != nil {
+		return id, err
+	}
+
+	if res.IsError() {
+		return id, errors.New(error.Error)
+	}
+
+	return id, nil
 }
 
-func (u *DataAssetImpl) UpdateNonStructured(dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error) {
+func (u *DataAssetImpl) UpdateAsset(id string, dataAssetInput common.UpdateDataAssetRequest) (common.PublicDataAsset, error) {
+	var asset common.PublicDataAsset
+	var error common.Error
+
+	res, err := u.Config.Client.R().SetPathParam("id", id).SetBody(&dataAssetInput).SetResult(&asset).SetError(&error).Put(common.UpdateDataAssetByID)
+
+	if err != nil {
+		return asset, err
+	}
+
+	if res.IsError() {
+		return asset, errors.New(error.Error)
+	}
+
+	return asset, nil
+}
+
+func (u *DataAssetImpl) UpdateFile(id string, fileName string, fileContent []byte, aclList *[]common.ACLRequest, expirationDate *time.Time) (common.PublicDataAsset, error) {
+	var asset common.PublicDataAsset
+	var error common.Error
+
+	formData := make(map[string]string)
+
+	if aclList != nil {
+		aclJSON, err := json.Marshal(aclList)
+		if err != nil {
+			return asset, err
+		}
+		formData["acl"] = string(aclJSON)
+	}
+
+	if expirationDate != nil {
+		formData["expiration_date"] = toRFC3339(*expirationDate)
+	}
+
+	req := u.Config.Client.R().SetFileReader("data", fileName, bytes.NewReader(fileContent))
+
+	if len(formData) > 0 {
+		req = req.SetFormData(formData)
+	}
+
+	res, err := req.SetPathParam("id", id).SetResult(&asset).SetError(&error).Put(common.UpdateDataAssetByID)
+
+	if err != nil {
+		return asset, err
+	}
+
+	if res.IsError() {
+		return asset, errors.New(error.Error)
+	}
+
+	return asset, nil
 
 }
 
 func (u *DataAssetImpl) DeleteAsset(id int64) (common.MessageResponse, error) {
+	var message common.MessageResponse
+	var error common.Error
 
+	res, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%v", id)).SetResult(&message).SetError(&error).Delete(common.DeleteDataAssetByID)
+
+	if err != nil {
+		return message, err
+	}
+
+	if res.IsError() {
+		return message, errors.New(error.Error)
+	}
+
+	return message, nil
 }
 
 func (u *DataAssetImpl) Share(id int64, shareDetails []common.ShareDataAssetRequest) ([]common.PublicACL, error) {
 
+	var acl []common.PublicACL
+	var error common.Error
+
+	res, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%v", id)).SetBody(&shareDetails).SetResult(&acl).SetError(&error).Post(common.ShareDataAssetByID)
+	
+	if err != nil {
+		return acl, err
+	}
+
+	if res.IsError() {
+		return acl, errors.New(error.Error)
+	}
+
+	return acl, nil
 }
 
 func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
