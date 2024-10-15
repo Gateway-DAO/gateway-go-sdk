@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
-	datamodels "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_models"
+	"gateway-go-sdk/pkg/common"
+	datamodels "gateway-go-sdk/pkg/data_models"
+
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"

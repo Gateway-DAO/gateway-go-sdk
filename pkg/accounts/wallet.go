@@ -3,7 +3,7 @@ package accounts
 import (
 	"errors"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"gateway-go-sdk/pkg/common"
 )
 
 type WalletInterface interface {

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"gateway-go-sdk/pkg/common"
 )
 
 type DataModel interface {

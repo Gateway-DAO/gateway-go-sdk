@@ -1,4 +1,4 @@
-module github.com/Gateway-DAO/gateway-go-sdk
+module gateway-go-sdk
 
 go 1.22
 

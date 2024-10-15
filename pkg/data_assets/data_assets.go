@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"gateway-go-sdk/pkg/common"
 )
 
 type FileResponse struct {
@@ -236,7 +236,7 @@ func (u *DataAssetImpl) Share(id int64, shareDetails []common.ShareDataAssetRequ
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%v", id)).SetBody(&shareDetails).SetResult(&acl).SetError(&error).Post(common.ShareDataAssetByID)
-	
+
 	if err != nil {
 		return acl, err
 	}
