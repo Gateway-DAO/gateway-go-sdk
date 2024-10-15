@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 
-	"gateway-go-sdk/internal/services"
 )
 
 type WalletTypeEnum string
