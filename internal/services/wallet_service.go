@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-
 )
 
 type WalletTypeEnum string
@@ -12,21 +11,24 @@ const (
 	Solana   WalletTypeEnum = "solana"
 )
 
-// WalletService holds the wallet type and the appropriate service (Ethereum or Solana).
+type Wallet interface {
+	SignMessage(message string) (WalletSignMessageType, error)
+}
+
 type WalletService struct {
-	wallet        WalletService
+	wallet        Wallet
 	walletType    WalletTypeEnum
 	walletPrivKey string
 }
 
 func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*WalletService, error) {
-	var wallet WalletService
+	var wallet Wallet
 
 	switch walletType {
 	case Ethereum:
-		wallet = services.NewEtherumService(walletPrivateKey)
+		wallet = NewEtherumService(walletPrivateKey)
 	case Solana:
-		wallet = services.NewSolanaService(walletPrivateKey)
+		wallet = NewSolanaService(walletPrivateKey)
 	default:
 		return nil, fmt.Errorf("unsupported wallet type")
 	}
@@ -38,7 +40,6 @@ func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*Wall
 	}, nil
 }
 
-// SignMessage signs a message using the appropriate wallet service.
 func (ws *WalletService) SignMessage(message string) (WalletSignMessageType, error) {
 	return ws.wallet.SignMessage(message)
 }
