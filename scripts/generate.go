@@ -27,8 +27,9 @@ type Operation struct {
 }
 
 type SwaggerType struct {
-	Type string `json:"type"`
-	Ref  string `json:"$ref"`
+	Type  string       `json:"type"`
+	Ref   string       `json:"$ref"`
+	Items *SwaggerType `json:"items"`
 }
 
 func GenerateTypes() {
@@ -44,7 +45,6 @@ func GenerateTypes() {
 		fmt.Println("Error parsing JSON:", err)
 		return
 	}
-
 	goTypes := extractGoTypes(schema)
 
 	routeConstants := GenerateRouteConstants(schema.Paths)

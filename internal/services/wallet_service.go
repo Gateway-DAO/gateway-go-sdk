@@ -1,6 +1,10 @@
 package services
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
+)
 
 type WalletTypeEnum string
 
@@ -21,9 +25,9 @@ func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*Wall
 
 	switch walletType {
 	case Ethereum:
-		wallet = ethereumservice.NewEtherumService(walletPrivateKey)
+		wallet = services.NewEtherumService(walletPrivateKey)
 	case Solana:
-		wallet = solanaservice.NewSolanaService(walletPrivateKey)
+		wallet = services.NewSolanaService(walletPrivateKey)
 	default:
 		return nil, fmt.Errorf("unsupported wallet type")
 	}

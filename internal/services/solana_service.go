@@ -8,8 +8,8 @@ import (
 
 	"golang.org/x/crypto/ed25519"
 
-	"github.com/blocto/solana-go-sdk/common"
 	"github.com/blocto/solana-go-sdk/types"
+	"github.com/gagliardetto/solana-go"
 )
 
 type SolanaService struct {
@@ -23,7 +23,7 @@ func NewSolanaService(walletPrivateKey string) *SolanaService {
 		log.Fatalf("Failed to decode private key: %v", err)
 	}
 
-	wallet, err := types.AccountFromPrivateKeyBytes(privateKey)
+	wallet, err := types.AccountFromBytes(privateKey)
 	if err != nil {
 		log.Fatalf("Failed to create wallet from private key: %v", err)
 	}
@@ -41,12 +41,12 @@ func (ss *SolanaService) SignMessage(message string) (WalletSignMessageType, err
 	signature := base64.StdEncoding.EncodeToString(signedMessage)
 
 	return WalletSignMessageType{
-		Signature:  signature,
+		Signature:  []byte(signature),
 		SigningKey: ss.wallet.PublicKey.ToBase58(),
 	}, nil
 }
 
-func VerifyMessage(message, signature, publicKey string) (bool, error) {
+func (ss *SolanaService) VerifyMessage(message, signature, publicKey string) (bool, error) {
 	messageBytes := []byte(message)
 	signatureBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
@@ -62,9 +62,10 @@ func VerifyMessage(message, signature, publicKey string) (bool, error) {
 	return isValid, nil
 }
 
-func ValidateWallet(wallet string) (string, error) {
-	if !common.PublicKeyFromString(wallet).IsValid() {
-		return "", errors.New("invalid wallet address")
+func (ss *SolanaService) ValidateWallet(wallet string) (string, error) {
+	pubKey, err := solana.PublicKeyFromBase58(wallet)
+	if err != nil {
+		return "", errors.New("invalid wallet address: " + err.Error())
 	}
-	return wallet, nil
+	return pubKey.String(), nil
 }

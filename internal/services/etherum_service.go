@@ -53,7 +53,7 @@ func (es *EtherumService) SignMessage(message string) (WalletSignMessageType, er
 	}, nil
 }
 
-func VerifyMessage(signature []byte, message, walletAddress string) (bool, error) {
+func (es *EtherumService) VerifyMessage(signature []byte, message, walletAddress string) (bool, error) {
 	msgHash := crypto.Keccak256Hash([]byte(message))
 
 	publicKey, err := crypto.SigToPub(msgHash.Bytes(), signature)
@@ -66,6 +66,6 @@ func VerifyMessage(signature []byte, message, walletAddress string) (bool, error
 	return recoveredAddr == walletAddress, nil
 }
 
-func ValidateWallet(wallet string) bool {
+func (es *EtherumService) ValidateWallet(wallet string) bool {
 	return common.IsHexAddress(wallet)
 }

@@ -22,7 +22,7 @@ func NewACLImpl(config common.SDKConfig) *ACLImpl {
 	}
 }
 
-func (u *DataAssetImpl) Add(id int64, aclList []common.ACLRequest) (common.PublicACL, error) {
+func (u *ACLImpl) Add(id int64, aclList []common.ACLRequest) (common.PublicACL, error) {
 	var publicACL common.PublicACL
 	var error common.Error
 
@@ -40,7 +40,7 @@ func (u *DataAssetImpl) Add(id int64, aclList []common.ACLRequest) (common.Publi
 
 }
 
-func (u *DataAssetImpl) Update(id int64, aclList []common.ACLRequest) (common.PublicACL, error) {
+func (u *ACLImpl) Update(id int64, aclList []common.ACLRequest) (common.PublicACL, error) {
 	var publicACL common.PublicACL
 	var error common.Error
 
@@ -57,19 +57,19 @@ func (u *DataAssetImpl) Update(id int64, aclList []common.ACLRequest) (common.Pu
 	return publicACL, nil
 }
 
-func (u *DataAssetImpl) Delete(id int64, aclList []common.ACLRequest) (string, error) {
-	var message string
+func (u *ACLImpl) Delete(id int64, aclList []common.ACLRequest) (string, error) {
+	var response common.MessageResponse
 	var error common.Error
 
-	res, err := u.Config.Client.R().SetBody(&aclList).SetResult(&message).SetError(&error).Delete(common.DeleteAssignedRoleByACL)
+	res, err := u.Config.Client.R().SetBody(&aclList).SetResult(&response).SetError(&error).Delete(common.DeleteAssignedRoleByACL)
 
 	if err != nil {
-		return message, err
+		return response.Message, err
 	}
 
 	if res.IsError() {
-		return message, errors.New(error.Error)
+		return response.Message, errors.New(error.Error)
 	}
 
-	return message, nil
+	return response.Message, nil
 }

@@ -13,6 +13,7 @@ type SDK struct {
 	DataAssets dataassets.DataAsset
 	DataModel  datamodels.DataModel
 	Account    *accounts.AccountsImpl
+	ACL        dataassets.ACL
 	Auth       auth.Auth
 	APIKey     string
 }
@@ -32,6 +33,7 @@ func NewSDK(apiKey string) *SDK {
 		DataAssets: dataassets.NewDataAssetImpl(config),
 		DataModel:  datamodels.NewDataModelImpl(config),
 		Auth:       auth.NewAuthImpl(config),
+		ACL:        dataassets.NewACLImpl(config),
 		Account:    accounts.NewAccountsImpl(config),
 		APIKey:     apiKey,
 	}
