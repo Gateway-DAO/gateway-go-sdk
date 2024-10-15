@@ -19,8 +19,8 @@ jobs:
         run: go mod tidy
 
       - name: List files in the directory
-        run: ls -la
-        
+        run: cd pkg
+
       - name: Run tests
         run: go test -coverprofile=coverage.txt
 
