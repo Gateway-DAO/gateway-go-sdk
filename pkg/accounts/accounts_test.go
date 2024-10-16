@@ -1,6 +1,7 @@
 package accounts_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -72,6 +73,28 @@ func TestAccountsImpl(t *testing.T) {
 		assert.Empty(t, token)
 	})
 
+	t.Run("TestCreateAccountHTTPRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Simulate a client-side error (e.g., network error)
+		httpmock.RegisterResponder("POST", common.CreateAccount, func(req *http.Request) (*http.Response, error) {
+			return nil, errors.New("client-side error")
+		})
+
+		// Test
+		accountDetails := common.AccountCreateRequest{
+			Signature:     "test",
+			WalletAddress: "test",
+			Message:       "test",
+		}
+		token, err := accountImpl.Create(accountDetails)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, token)
+	})
+
 	t.Run("TestGetMe", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -100,6 +123,23 @@ func TestAccountsImpl(t *testing.T) {
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to get account"}`
 		httpmock.RegisterResponder("GET", common.GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
+
+		// Test
+		myAccount, err := accountImpl.GetMe()
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, myAccount)
+	})
+
+	t.Run("TestGetMeHTTPRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Simulate a client-side error (e.g., network error)
+		httpmock.RegisterResponder("POST", common.GetMyAccount, func(req *http.Request) (*http.Response, error) {
+			return nil, errors.New("client-side error")
+		})
 
 		// Test
 		myAccount, err := accountImpl.GetMe()
@@ -140,6 +180,26 @@ func TestAccountsImpl(t *testing.T) {
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to update account"}`
 		httpmock.RegisterResponder("PATCH", common.GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
+
+		// Test
+		updateDetails := common.AccountUpdateRequest{
+			ProfilePicture: "test",
+		}
+		myAccount, err := accountImpl.UpdateMe(updateDetails)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, myAccount)
+	})
+
+	t.Run("TestUpdateMeHTTPRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Simulate a client-side error (e.g., network error)
+		httpmock.RegisterResponder("PATCH", common.GetMyAccount, func(req *http.Request) (*http.Response, error) {
+			return nil, errors.New("client-side error")
+		})
 
 		// Test
 		updateDetails := common.AccountUpdateRequest{

@@ -1,6 +1,7 @@
 package accounts_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -65,6 +66,23 @@ func TestWalletImpl(t *testing.T) {
 		assert.Empty(t, result.WalletAddresses)
 	})
 
+	t.Run("TestAddWalletHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Simulate a client-side error (e.g., network error)
+		httpmock.RegisterResponder("POST", common.AddWallet, func(req *http.Request) (*http.Response, error) {
+			return nil, errors.New("client-side error")
+		})
+
+		// Test
+		result, err := walletImpl.Add("0xTestAddress")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.WalletAddresses)
+	})
+
 	t.Run("TestRemoveWallet", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -95,6 +113,23 @@ func TestWalletImpl(t *testing.T) {
 			resp := httpmock.NewStringResponse(400, errorResponse)
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
+		})
+
+		// Test
+		result, err := walletImpl.Remove("0xTestAddress")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.WalletAddresses)
+	})
+
+	t.Run("TestRemoveWalletHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Simulate a client-side error (e.g., network error)
+		httpmock.RegisterResponder("DELETE", common.RemoveWallet, func(req *http.Request) (*http.Response, error) {
+			return nil, errors.New("client-side error")
 		})
 
 		// Test

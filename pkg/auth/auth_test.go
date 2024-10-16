@@ -1,6 +1,7 @@
 package auth_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -62,6 +63,21 @@ func TestAuthSuite(t *testing.T) {
 		assert.Empty(t, token)
 	})
 
+	t.Run("TestLoginHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("POST", common.AuthenticateAccount, httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		token, err := authImpl.Login("test-message", "test-signature", "test-wallet")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, token)
+	})
+
 	t.Run("TestGetMessage", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -99,6 +115,21 @@ func TestAuthSuite(t *testing.T) {
 		assert.Empty(t, message)
 	})
 
+	t.Run("TestGetMessageHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("GET", common.GenerateSignMessage, httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		message, err := authImpl.GetMessage()
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, message)
+	})
+
 	t.Run("TestGetRefreshToken", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -127,6 +158,21 @@ func TestAuthSuite(t *testing.T) {
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
 		httpmock.RegisterResponder("GET", common.RefreshToken, responder)
+
+		// Test
+		token, err := authImpl.GetRefreshToken()
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, token)
+	})
+
+	t.Run("TestGetRefreshTokenHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("GET", common.RefreshToken, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
 		token, err := authImpl.GetRefreshToken()
