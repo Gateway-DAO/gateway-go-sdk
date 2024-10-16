@@ -33,7 +33,7 @@ type WalletDetails struct {
 
 func NewSDK(config SDKConfig) *SDK {
 	client := resty.New()
-	client.OnBeforeRequest(helpers.Middleware)
+	client.OnBeforeRequest(helpers.AuthMiddleware)
 	if config.URL != "" {
 		client.SetBaseURL(config.URL)
 	} else {

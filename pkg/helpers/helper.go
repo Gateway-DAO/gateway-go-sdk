@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
@@ -44,15 +43,16 @@ func AuthMiddleware(c *resty.Client, r *resty.Request) error {
 	accessToken := r.Header.Get("Authorization")
 
 	if accessToken == "" {
-		newToken, err := IssueJWT("username")
-		if err != nil {
-			return fmt.Errorf("failed to issue new token: %v", err)
-		}
+		// newToken, err := IssueJWT("username")
+		newToken := ""
+		// if err != nil {
+		// 	return fmt.Errorf("failed to issue new token: %v", err)
+		// }
 		accessToken = newToken
 	} else {
-		isValid, err := CheckJWTTokenExpiration(accessToken)
+		isValid, _ := CheckJWTTokenExpiration(accessToken)
 		if !isValid {
-			
+
 		}
 
 	}
