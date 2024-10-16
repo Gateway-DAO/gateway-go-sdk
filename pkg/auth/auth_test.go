@@ -83,6 +83,22 @@ func TestAuthSuite(t *testing.T) {
 		assert.Equal(t, "test-message", message)
 	})
 
+	t.Run("TestGetMessageError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
+		httpmock.RegisterResponder("GET", common.GenerateSignMessage, responder)
+
+		// Test
+		message, err := authImpl.GetMessage()
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, message)
+	})
+
 	t.Run("TestGetRefreshToken", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -102,5 +118,21 @@ func TestAuthSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, "refresh-token", token)
+	})
+
+	t.Run("TestGetRefreshTokenError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
+		httpmock.RegisterResponder("GET", common.RefreshToken, responder)
+
+		// Test
+		token, err := authImpl.GetRefreshToken()
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, token)
 	})
 }
