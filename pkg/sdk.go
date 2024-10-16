@@ -1,11 +1,11 @@
 package pkg
 
 import (
-	"gateway-go-sdk/pkg/accounts"
-	"gateway-go-sdk/pkg/auth"
-	"gateway-go-sdk/pkg/common"
-	dataassets "gateway-go-sdk/pkg/data_assets"
-	datamodels "gateway-go-sdk/pkg/data_models"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	dataassets "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_assets"
+	datamodels "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_models"
 
 	"github.com/go-resty/resty/v2"
 )

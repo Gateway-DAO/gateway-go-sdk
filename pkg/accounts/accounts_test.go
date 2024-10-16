@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"gateway-go-sdk/pkg/accounts"
-	"gateway-go-sdk/pkg/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"

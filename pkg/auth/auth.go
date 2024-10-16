@@ -2,7 +2,8 @@ package auth
 
 import (
 	"errors"
-	"gateway-go-sdk/pkg/common"
+
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
 type Auth interface {
