@@ -15,6 +15,6 @@ format:
 	go fmt ./...
 
 test:
-	go test ./...
+	go test ./... -coverprofile=coverage.txt
 
 .PHONY: generate-types format
