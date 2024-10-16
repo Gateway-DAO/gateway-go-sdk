@@ -1,6 +1,9 @@
 package pkg
 
 import (
+	"log"
+
+	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
@@ -28,12 +31,11 @@ type SDKConfig struct {
 
 type WalletDetails struct {
 	PrivateKey string
-	WalletType common.WalletTypeEnum
+	WalletType services.WalletTypeEnum
 }
 
 func NewSDK(config SDKConfig) *SDK {
 	client := resty.New()
-	client.OnBeforeRequest(helpers.AuthMiddleware)
 	if config.URL != "" {
 		client.SetBaseURL(config.URL)
 	} else {
@@ -42,6 +44,16 @@ func NewSDK(config SDKConfig) *SDK {
 
 	if config.ApiKey != "" {
 		client.SetAuthToken(config.ApiKey)
+	} else {
+		log.Println("here")
+		wallet, _ := services.NewWalletService(config.WalletDetails.PrivateKey, config.WalletDetails.WalletType)
+		params := services.MiddlewareParams{
+			Client: client,
+			Wallet: *wallet,
+		}
+		log.Println("here", wallet)
+
+		client.OnBeforeRequest(helpers.AuthMiddleware(params))
 	}
 
 	sdkClient := common.SDKConfig{

@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
-
-type WalletSignMessageType struct {
-	Signature  []byte
-	SigningKey string
-}
 
 type EtherumService struct {
 	walletPrivateKey *ecdsa.PrivateKey
@@ -40,15 +37,20 @@ func NewEtherumService(walletPrivateKey string) *EtherumService {
 }
 
 func (es *EtherumService) SignMessage(message string) (WalletSignMessageType, error) {
-	msgHash := crypto.Keccak256Hash([]byte(message))
+	messageHash := accounts.TextHash([]byte(message))
 
-	signature, err := crypto.Sign(msgHash.Bytes(), es.walletPrivateKey)
+	signature, err := crypto.Sign(messageHash, es.walletPrivateKey)
+
 	if err != nil {
 		return WalletSignMessageType{}, fmt.Errorf("failed to sign message: %v", err)
 	}
 
+	if signature[64] < 27 {
+		signature[64] += 27
+	}
+
 	return WalletSignMessageType{
-		Signature:  signature,
+		Signature:  hexutil.Encode(signature),
 		SigningKey: es.walletAddress,
 	}, nil
 }

@@ -18,10 +18,7 @@ type SolanaService struct {
 }
 
 func NewSolanaService(walletPrivateKey string) *SolanaService {
-	privateKey, err := base64.StdEncoding.DecodeString(walletPrivateKey)
-	if err != nil {
-		log.Fatalf("Failed to decode private key: %v", err)
-	}
+	privateKey := solana.MustPrivateKeyFromBase58(walletPrivateKey)
 
 	wallet, err := types.AccountFromBytes(privateKey)
 	if err != nil {
@@ -39,9 +36,9 @@ func (ss *SolanaService) SignMessage(message string) (WalletSignMessageType, err
 
 	signedMessage := ed25519.Sign(ss.wallet.PrivateKey, messageBytes)
 	signature := base64.StdEncoding.EncodeToString(signedMessage)
-
+	log.Println(signature)
 	return WalletSignMessageType{
-		Signature:  []byte(signature),
+		Signature:  signature,
 		SigningKey: ss.wallet.PublicKey.ToBase58(),
 	}, nil
 }

@@ -1,18 +1,8 @@
 package common
 
-import "github.com/go-resty/resty/v2"
-
-type WalletTypeEnum string
-
-const (
-	Ethereum WalletTypeEnum = "ethereum"
-	Solana   WalletTypeEnum = "solana"
+import (
+	"github.com/go-resty/resty/v2"
 )
-
-type WalletSignMessageType struct {
-	Signature  []byte
-	SigningKey string
-}
 
 type SDKConfig struct {
 	Client *resty.Client

@@ -3,8 +3,20 @@ package services
 import (
 	"fmt"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"github.com/go-resty/resty/v2"
 )
+
+type WalletTypeEnum string
+
+const (
+	Ethereum WalletTypeEnum = "ethereum"
+	Solana   WalletTypeEnum = "solana"
+)
+
+type WalletSignMessageType struct {
+	Signature  string
+	SigningKey string
+}
 
 type Wallet interface {
 	SignMessage(message string) (WalletSignMessageType, error)
@@ -12,17 +24,22 @@ type Wallet interface {
 
 type WalletService struct {
 	wallet        Wallet
-	walletType    common.WalletTypeEnum
+	walletType    WalletTypeEnum
 	walletPrivKey string
 }
 
-func NewWalletService(walletPrivateKey string, walletType common.WalletTypeEnum) (*WalletService, error) {
+type MiddlewareParams struct {
+	Client *resty.Client
+	Wallet WalletService
+}
+
+func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*WalletService, error) {
 	var wallet Wallet
 
 	switch walletType {
-	case common.Ethereum:
+	case Ethereum:
 		wallet = NewEtherumService(walletPrivateKey)
-	case common.Solana:
+	case Solana:
 		wallet = NewSolanaService(walletPrivateKey)
 	default:
 		return nil, fmt.Errorf("unsupported wallet type")

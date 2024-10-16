@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
@@ -23,7 +24,7 @@ func NewAuthImpl(config common.SDKConfig) *AuthImpl {
 }
 
 func (u *AuthImpl) Login(message string, signature string, wallet_address string) (string, error) {
-
+	log.Println(message, signature, wallet_address)
 	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 
@@ -46,7 +47,7 @@ func (u *AuthImpl) GetMessage() (string, error) {
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetResult(&messageResponse).SetError(&error).Get(common.GenerateSignMessage)
-
+	log.Println(res)
 	if err != nil {
 		return messageResponse.Message, err
 	}
