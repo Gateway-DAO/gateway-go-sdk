@@ -1,5 +1,3 @@
-//go:build ignoretest
-
 package scripts
 
 import (

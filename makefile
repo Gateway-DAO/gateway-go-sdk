@@ -15,6 +15,7 @@ format:
 	go fmt ./...
 
 test:
-	go test ./... -v -cover
+	go test -count=1 -coverprofile coverage.out -coverpkg=./... ./...
+	cat coverage.out | grep -v "scripts" | grep -v "othername" > coverage.text
 
 .PHONY: generate-types format

@@ -1,5 +1,3 @@
-//go:build ignoretest
-
 package scripts
 
 import (
@@ -51,7 +49,7 @@ func GenerateTypes() {
 
 	routeConstants := GenerateRouteConstants(schema.Paths)
 
-	outputTypes := "package common\n\n" + `import "github.com/go-resty/resty/v2"` + "\n\n" + `type MethodType string
+	outputTypes := "package common\n\n" + `import "github.com/go-resty/resty/v2"` + "\n\n" + `
 	type WalletSignMessageType struct {
 	Signature  []byte
 	SigningKey string
