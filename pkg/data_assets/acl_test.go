@@ -1,6 +1,7 @@
 package dataassets_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -71,6 +72,26 @@ func TestACLSuite(t *testing.T) {
 		assert.Error(t, err)
 	})
 
+	t.Run("TestAddACLHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("POST", common.AssignACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		aclList := []common.ACLRequest{
+			{Address: "test", Roles: []common.AccessLevel{
+				common.RoleShare,
+			}},
+		}
+		_, err := aclImpl.Add(1, aclList)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "http request error")
+	})
+
 	t.Run("TestUpdateACL", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -117,6 +138,26 @@ func TestACLSuite(t *testing.T) {
 		assert.Error(t, err)
 	})
 
+	t.Run("TestUpdateACLHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("PUT", common.UpdateACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		aclList := []common.ACLRequest{
+			{Address: "test", Roles: []common.AccessLevel{
+				common.RoleShare,
+			}},
+		}
+		_, err := aclImpl.Update(1, aclList)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "http request error")
+	})
+
 	t.Run("TestDeleteACL", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -161,6 +202,27 @@ func TestACLSuite(t *testing.T) {
 
 		// Assertions
 		assert.Error(t, err)
+		assert.Empty(t, message)
+	})
+
+	t.Run("TestDeleteACLHttpRequestError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("DELETE", common.DeleteAssignedRoleByACL, httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		aclList := []common.ACLRequest{
+			{Address: "test", Roles: []common.AccessLevel{
+				common.RoleShare,
+			}},
+		}
+		message, err := aclImpl.Delete(1, aclList)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "http request error")
 		assert.Empty(t, message)
 	})
 }

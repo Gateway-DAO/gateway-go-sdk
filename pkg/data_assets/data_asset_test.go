@@ -1,8 +1,10 @@
 package dataassets_test
 
 import (
+	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 	dataassets "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_assets"
@@ -234,5 +236,74 @@ func TestDataAssetSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(result))
+	})
+
+	t.Run("TestUploadFileSuccess", func(t *testing.T) {
+		// Setup
+		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+			httpmock.NewJsonResponderOrPanic(200, common.DataAssetIDRequestAndResponse{Id: 123}))
+
+		// Test
+		expirationDate := time.Now().Add(24 * time.Hour)
+		aclList := []common.ACLRequest{
+			{Address: "test", Roles: []common.AccessLevel{common.RoleShare}},
+		}
+		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), &aclList, &expirationDate)
+
+		// Assertions
+		assert.NoError(t, err)
+		assert.Equal(t, 123, result.Id)
+	})
+
+	t.Run("TestUploadFileError", func(t *testing.T) {
+		// Setup
+		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+			httpmock.NewJsonResponderOrPanic(400, common.Error{Error: "Upload failed"}))
+
+		// Test
+		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), nil, nil)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.Id)
+	})
+
+	t.Run("TestUploadFileHttpRequestError", func(t *testing.T) {
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), nil, nil)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.Id)
+	})
+
+	t.Run("TestUpdateFileError", func(t *testing.T) {
+		// Setup
+		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+			httpmock.NewJsonResponderOrPanic(400, common.Error{Error: "Update failed"}))
+
+		// Test
+		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("new content"), nil, nil)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.Id)
+	})
+
+	t.Run("TestUpdateFileHttpRequestError", func(t *testing.T) {
+		// Register an error responder to simulate HTTP request error
+		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Test
+		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("new content"), nil, nil)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result.Id)
 	})
 }
