@@ -69,3 +69,7 @@ func (ss *SolanaService) ValidateWallet(wallet string) (string, error) {
 	}
 	return pubKey.String(), nil
 }
+
+func (ss *SolanaService) GetWallet() string {
+	return ss.wallet.PublicKey.String()
+}

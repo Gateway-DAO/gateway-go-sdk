@@ -69,3 +69,7 @@ func (es *EtherumService) VerifyMessage(signature []byte, message, walletAddress
 func (es *EtherumService) ValidateWallet(wallet string) bool {
 	return common.IsHexAddress(wallet)
 }
+
+func (es *EtherumService) GetWallet() string {
+	return es.walletAddress
+}

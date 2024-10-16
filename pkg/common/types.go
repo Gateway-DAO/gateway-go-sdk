@@ -2,7 +2,13 @@ package common
 
 import "github.com/go-resty/resty/v2"
 
-type MethodType string
+type WalletTypeEnum string
+
+const (
+	Ethereum WalletTypeEnum = "ethereum"
+	Solana   WalletTypeEnum = "solana"
+)
+
 type WalletSignMessageType struct {
 	Signature  []byte
 	SigningKey string

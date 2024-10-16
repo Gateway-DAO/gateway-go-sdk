@@ -2,13 +2,8 @@ package services
 
 import (
 	"fmt"
-)
 
-type WalletTypeEnum string
-
-const (
-	Ethereum WalletTypeEnum = "ethereum"
-	Solana   WalletTypeEnum = "solana"
+	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
 type Wallet interface {
@@ -17,17 +12,17 @@ type Wallet interface {
 
 type WalletService struct {
 	wallet        Wallet
-	walletType    WalletTypeEnum
+	walletType    common.WalletTypeEnum
 	walletPrivKey string
 }
 
-func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*WalletService, error) {
+func NewWalletService(walletPrivateKey string, walletType common.WalletTypeEnum) (*WalletService, error) {
 	var wallet Wallet
 
 	switch walletType {
-	case Ethereum:
+	case common.Ethereum:
 		wallet = NewEtherumService(walletPrivateKey)
-	case Solana:
+	case common.Solana:
 		wallet = NewSolanaService(walletPrivateKey)
 	default:
 		return nil, fmt.Errorf("unsupported wallet type")
