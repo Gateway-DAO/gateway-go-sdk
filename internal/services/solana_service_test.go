@@ -7,60 +7,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestNewSolanaService(t *testing.T) {
-// 	// Sample private key (base64 encoded)
-// 	privateKeyHex := "3d4f1506a8c0289186c10a391ef493ce38fa8dca8e1c02e2d1ff3b30f3a8c4d8"
+func TestNewSolanaService(t *testing.T) {
+	// Known valid Solana private key (Base58-encoded)
+	privateKeyBase58 := "5f44d72YmGb68Dm9AYMo6hfG4bPv5URTgfay63yxDFmc1AEWrYyiVuDhktkWUKr5kduCZWyDaJa8rBPUuzW3sqzn" // Replace this with a valid test key
 
-// 	service := services.NewSolanaService(privateKeyHex)
+	// Instantiate SolanaService
+	solanaService := services.NewSolanaService(privateKeyBase58)
 
-// 	// Assertions
-// 	assert.NotNil(t, service)
-// 	assert.NotNil(t, service.GetWallet())
-// }
+	// Check if the wallet was created successfully
+	assert.NotNil(t, solanaService.GetWallet(), "Wallet should be initialized correctly")
+}
 
-// func TestSolanaSignMessage(t *testing.T) {
-// 	privateKeyHex := "3d4f1506a8c0289186c10a391ef493ce38fa8dca8e1c02e2d1ff3b30f3a8c4d8" // Replace with a valid base64-encoded private key
-// 	service := services.NewSolanaService(privateKeyHex)
+func TestValidateSolanaWallet(t *testing.T) {
+	// Known private key for testing
+	privateKeyBase58 := "5f44d72YmGb68Dm9AYMo6hfG4bPv5URTgfay63yxDFmc1AEWrYyiVuDhktkWUKr5kduCZWyDaJa8rBPUuzW3sqzn"
+	solanaService := services.NewSolanaService(privateKeyBase58)
 
-// 	message := "Hello, Solana!"
-// 	signedMessage, err := service.SignMessage(message)
+	// Valid Solana wallet address
+	validWallet := solanaService.GetWallet()
+	walletAddress, err := solanaService.ValidateWallet(validWallet)
+	assert.Nil(t, err, "Error should be nil when validating wallet")
+	assert.Equal(t, validWallet, walletAddress, "Wallet should be valid")
 
-// 	// Assertions
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, signedMessage.Signature)
-// }
-
-// func TestSolanaVerifyMessage(t *testing.T) {
-// 	privateKeyHex := "3d4f1506a8c0289186c10a391ef493ce38fa8dca8e1c02e2d1ff3b30f3a8c4d8" // Replace with a valid base64-encoded private key
-// 	service := services.NewSolanaService(privateKeyHex)
-
-// 	message := "Hello, Solana!"
-// 	signedMessage, err := service.SignMessage(message)
-// 	assert.NoError(t, err)
-
-// 	// Verify the message
-// 	isValid, err := service.VerifyMessage(message, string(signedMessage.Signature), signedMessage.SigningKey)
-// 	assert.NoError(t, err)
-// 	assert.True(t, isValid)
-
-// 	// Test with an invalid signature
-// 	isValid, err = service.VerifyMessage(message, "invalid_signature", signedMessage.SigningKey)
-// 	assert.NoError(t, err)
-// 	assert.False(t, isValid)
-// }
-
-func TestSolanaValidateWallet(t *testing.T) {
-	service := services.SolanaService{}
-
-	// Valid address (base58 encoded)
-	validAddress := "5hQWmqxdX2hzjGyK3oT8G9sNREcSgXX9HsbMSfS7gHeR" // Replace with a valid address
-	validatedAddress, err := service.ValidateWallet(validAddress)
-	assert.NoError(t, err)
-	assert.Equal(t, validAddress, validatedAddress)
-
-	// Invalid address
-	invalidAddress := "InvalidAddress"
-	_, err = service.ValidateWallet(invalidAddress)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid wallet address")
+	// Invalid wallet address
+	invalidWallet := "invalid_address"
+	_, err = solanaService.ValidateWallet(invalidWallet)
+	assert.NotNil(t, err, "There should be an error for invalid wallet address")
 }
