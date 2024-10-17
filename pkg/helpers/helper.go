@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -16,16 +15,10 @@ import (
 func CheckJWTTokenExpiration(tokenString string) (bool, error) {
 	claims := &jwt.RegisteredClaims{}
 
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return nil, nil
-	})
+	_, _, err := jwt.NewParser(jwt.WithoutClaimsValidation()).ParseUnverified(tokenString, claims)
 
 	if err != nil {
 		return false, err
-	}
-
-	if !token.Valid {
-		return false, errors.New("token is not valid")
 	}
 
 	if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {

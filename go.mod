@@ -23,6 +23,7 @@ require (
 	github.com/ethereum/c-kzg-4844 v1.0.0 // indirect
 	github.com/ethereum/go-verkle v0.1.1-0.20240829091221-dffa7562dbe9 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/supranational/blst v0.3.13 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
