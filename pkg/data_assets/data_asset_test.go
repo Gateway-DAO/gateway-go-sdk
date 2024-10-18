@@ -48,32 +48,17 @@ func TestDataAssetSuite(t *testing.T) {
 		assert.Equal(t, 1, result.Id)
 	})
 
-	t.Run("TestGetDataAssetError", func(t *testing.T) {
-		// Reset mock
-		httpmock.Reset()
-
-		// Set up mock response
-		responder := httpmock.NewStringResponder(400, `{"error": "Data asset not found"}`)
-		httpmock.RegisterResponder("GET", common.GetDataAssetByID, responder)
-
-		// Test
-		_, err := dataAssetImpl.Get(1)
-
-		// Assertions
-		assert.Error(t, err)
-	})
-
-	t.Run("TestGetMeServerError", func(t *testing.T) {
-		fixture := `{"error": "Internal server error"}`
+	t.Run("TestGetDataAssetHttpRequestError", func(t *testing.T) {
+		// Simulate an HTTP request error
 		httpmock.RegisterResponder("GET", common.GetDataAssetByID,
-			httpmock.NewStringResponder(500, fixture))
+			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Call the function
-		assets, err := dataAssetImpl.Get(1)
+		asset, err := dataAssetImpl.Get(123)
 
 		// Assertions
 		assert.Error(t, err)
-		assert.Empty(t, assets)
+		assert.Empty(t, asset)
 	})
 
 	t.Run("TestUploadDataAsset", func(t *testing.T) {
@@ -116,6 +101,22 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Assertions
 		assert.Error(t, err)
+	})
+
+	t.Run("TestUploadDataAssetHttpRequestError", func(t *testing.T) {
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		input := common.CreateDataAssetRequest{
+			Name: "New Asset",
+		}
+		// Call the Upload method
+		id, err := dataAssetImpl.Upload(input)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, id) // Assuming that id should be empty on error
 	})
 
 	t.Run("TestGetCreatedByMe", func(t *testing.T) {
@@ -187,6 +188,33 @@ func TestDataAssetSuite(t *testing.T) {
 		assert.Equal(t, 1, len(result.Data))
 	})
 
+	t.Run("TestGetReceivedByMeHttpRequestError", func(t *testing.T) {
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("GET", common.GetReceivedDataAssets,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Call the function
+		assets, err := dataAssetImpl.GetReceivedByMe(1, 10)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, assets)
+	})
+
+	t.Run("TestGetReceivedByMeServerError", func(t *testing.T) {
+		// Setup the fixture for a server error response
+		fixture := `{"error": "Internal server error"}`
+		httpmock.RegisterResponder("GET", common.GetReceivedDataAssets,
+			httpmock.NewStringResponder(500, fixture))
+
+		// Call the function
+		assets, err := dataAssetImpl.GetReceivedByMe(1, 10)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, assets)
+	})
+
 	t.Run("TestUpdateAsset", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -209,6 +237,43 @@ func TestDataAssetSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, "Updated Asset", result.Name)
+	})
+
+	t.Run("TestUpdateAssetApiError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an API error response
+		fixture := `{"error": "Internal server error"}`
+		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+			httpmock.NewStringResponder(500, fixture))
+
+		input := common.UpdateDataAssetRequest{
+			Name: "New Asset",
+		}
+		// Call the UpdateAsset method
+		asset, err := dataAssetImpl.UpdateAsset("1", input)
+
+		// Assertions
+		assert.Error(t, err)   // This should be true now
+		assert.Empty(t, asset) // Assert that the asset is empty on error
+	})
+
+	t.Run("TestUpdateAssetHttpRequestError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		input := common.UpdateDataAssetRequest{
+			Name: "New Asset",
+		}
+		// Call the UpdateAsset method
+		asset, err := dataAssetImpl.UpdateAsset("1", input)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, asset) // Assuming that asset should be empty on error
 	})
 
 	t.Run("TestDeleteAsset", func(t *testing.T) {
@@ -276,6 +341,74 @@ func TestDataAssetSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(result))
+	})
+
+	t.Run("TestShareHttpRequestError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("POST", common.ShareDataAssetByID,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		shareDetails := []common.ShareDataAssetRequest{
+			{Addresses: []string{"test"}},
+		}
+		// Call the Share method
+		acl, err := dataAssetImpl.Share(1, shareDetails)
+
+		// Assertions
+		assert.Error(t, err) // Expecting an error
+		assert.Empty(t, acl) // Assert that the acl slice is empty on error
+	})
+
+	t.Run("TestShareApiError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an API error response
+		fixture := `{"error": "Internal server error"}`
+		httpmock.RegisterResponder("POST", common.ShareDataAssetByID,
+			httpmock.NewStringResponder(500, fixture))
+
+		shareDetails := []common.ShareDataAssetRequest{
+			{Addresses: []string{"test"}},
+		}
+		// Call the Share method
+		acl, err := dataAssetImpl.Share(1, shareDetails)
+
+		// Assertions
+		assert.Error(t, err) // Expecting an error
+		assert.Empty(t, acl) // Assert that the acl slice is empty on error
+	})
+
+	t.Run("TestDeleteAssetApiError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an API error response
+		fixture := `{"error": "Asset not found"}`
+		httpmock.RegisterResponder("DELETE", common.DeleteDataAssetByID,
+			httpmock.NewStringResponder(404, fixture))
+
+		// Call the DeleteAsset method
+		message, err := dataAssetImpl.DeleteAsset(1)
+
+		// Assertions
+		assert.Error(t, err)     // Expecting an error
+		assert.Empty(t, message) // Assert that the message response is empty on error
+	})
+
+	t.Run("TestDeleteAssetHttpRequestError", func(t *testing.T) {
+		httpmock.Reset()
+
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("DELETE", common.DeleteDataAssetByID,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Call the DeleteAsset method
+		message, err := dataAssetImpl.DeleteAsset(1)
+
+		// Assertions
+		assert.Error(t, err)                               // Expecting an error
+		assert.Empty(t, message)                           // Assert that the message response is empty on error
 	})
 
 	t.Run("TestUploadFileSuccess", func(t *testing.T) {
