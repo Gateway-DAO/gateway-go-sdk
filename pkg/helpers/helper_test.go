@@ -38,6 +38,20 @@ func TestCheckJWTTokenExpiration_Valid(t *testing.T) {
 	assert.True(t, isValid)
 }
 
+func TestCheckJWTTokenExpiration(t *testing.T) {
+	t.Run("TestCheckJWTTokenExpirationError", func(t *testing.T) {
+		// Simulate an invalid token string that will cause an error during parsing
+		invalidToken := "invalid.token.string"
+
+		// Call the CheckJWTTokenExpiration function
+		valid, err := helpers.CheckJWTTokenExpiration(invalidToken)
+
+		// Assertions
+		assert.Error(t, err)   // Expecting an error
+		assert.False(t, valid) // valid should be false on error
+	})
+}
+
 func TestCheckJWTTokenExpiration_Expired(t *testing.T) {
 	secret := []byte("my-secret-key")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
@@ -78,6 +92,7 @@ func TestIssueJWT_Success(t *testing.T) {
 
 	// Assert the results
 	assert.Error(t, err)
+
 }
 
 func TestIssueJWT_FailSignMessage(t *testing.T) {
@@ -98,47 +113,6 @@ func TestIssueJWT_FailSignMessage(t *testing.T) {
 	// Assert that an error was returned
 	assert.Error(t, err)
 }
-
-// func TestAuthMiddleware_NewToken(t *testing.T) {
-// 	client := resty.New()
-// 	client.SetBaseURL("https://example.com")
-// 	httpmock.ActivateNonDefault(client.GetClient())
-// 	defer httpmock.DeactivateAndReset()
-
-// 	// Mock wallet behavior
-// 	mockWallet := new(MockWallet)
-// 	mockWallet.On("SignMessage", mock.Anything).Return(services.WalletSignMessageType{
-// 		Signature:  "mock-signature",
-// 		SigningKey: "mock-signing-key",
-// 	}, nil)
-
-// 	// Mock the /auth/message and /auth/login endpoints
-// 	httpmock.RegisterResponder("GET", "https://example.com/auth/message",
-// 		httpmock.NewStringResponder(200, `"mock-message"`))
-// 	httpmock.RegisterResponder("POST", "https://example.com/auth/login",
-// 		httpmock.NewStringResponder(200, `"mock-jwt-token"`))
-
-// 	// Create middleware params
-// 	params := services.MiddlewareParams{
-// 		Client: client,
-// 		Wallet: services.WalletService{
-
-// 		},
-// 	}
-
-// 	// Create middleware function
-// 	middleware := helpers.AuthMiddleware(params)
-
-// 	// Mock the request without an Authorization token
-// 	req := client.R().SetHeader("Authorization", "")
-
-// 	// Call middleware
-// 	err := middleware(client, req)
-
-// 	// Check if token was set
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, req.Header.Get("Authorization"), "Authorization header should not be empty")
-// }
 
 func TestAuthMiddleware_ExistingValidToken(t *testing.T) {
 	client := resty.New()
