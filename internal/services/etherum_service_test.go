@@ -1,49 +1,98 @@
-package services_test
+package services
 
 import (
-	"encoding/hex"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewEtherumService(t *testing.T) {
-	// Known private key for testing (do not use this in production)
-	privateKeyHex := "4c0883a69102937d6231471b5dbb6204fe5129617082794ee3f2f7d9d3c10b6a"
-	expectedWalletAddress := "0xEB66720657C4b498d3E5fafb7748835A76dDfE3b" // Public address derived from the private key
+func TestSignMessageEth_Success(t *testing.T) {
+	// Test data
+	message := "test message"
+	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a") // Replace with a valid private key
 
-	ethService := services.NewEtherumService(privateKeyHex)
-
-	// Check if wallet address is derived correctly
-	assert.Equal(t, expectedWalletAddress, ethService.GetWallet(), "Wallet address should match the expected public address")
-}
-
-func TestSignAndVerifyMessage(t *testing.T) {
-	// Known private key for testing (do not use this in production)
-	privateKeyHex := "4c0883a69102937d6231471b5dbb6204fe5129617082794ee3f2f7d9d3c10b6a"
-	message := "Test message"
-	ethService := services.NewEtherumService(privateKeyHex)
-
-	// Sign message
+	// Act: sign the message
 	signedMessage, err := ethService.SignMessage(message)
-	assert.Nil(t, err, "Error should be nil when signing a message")
 
-	// Convert the signature to bytes
-	sigBytes, err := hex.DecodeString(signedMessage.Signature[2:]) // Removing "0x" prefix
-	assert.Nil(t, err, "Error should be nil when decoding hex signature")
-	sigBytes = append(sigBytes)
-	// Verify the signed message
+	// Assert: should sign successfully
+	assert.NoError(t, err)
+	assert.NotEmpty(t, signedMessage.Signature)
+	assert.Equal(t, ethService.walletAddress, signedMessage.SigningKey)
+
+	// Verify the signature
+	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, ethService.walletAddress)
+	assert.NoError(t, err)
+	assert.True(t, isValid)
 }
 
-func TestValidateWallet(t *testing.T) {
-	ethService := services.NewEtherumService("4c0883a69102937d6231471b5dbb6204fe5129617082794ee3f2f7d9d3c10b6a")
+func TestVerifyEtherumMessage_Success(t *testing.T) {
+	// Test data
+	message := "test message"
+	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	signedMessage, _ := ethService.SignMessage(message)
 
-	// Valid Ethereum address
-	validWallet := "0xEB66720657C4b498d3E5fafb7748835A76dDfE3b"
-	assert.True(t, ethService.ValidateWallet(validWallet), "Wallet should be valid")
+	// Act: verify the signed message
+	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, ethService.walletAddress)
 
-	// Invalid Ethereum address
-	invalidWallet := "invalid_address"
-	assert.False(t, ethService.ValidateWallet(invalidWallet), "Wallet should be invalid")
+	// Assert: should verify successfully
+	assert.NoError(t, err)
+	assert.True(t, isValid)
+}
+
+func TestVerifyEtherumMessage_InvalidSignature(t *testing.T) {
+	// Test data
+	message := "test message"
+	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	signedMessage, _ := ethService.SignMessage(message)
+
+	signedMessage.Signature = ""
+	// Modify the signature to make it invalid
+	invalidSignature := "0x1234567890abcdef0x1234567890abcdef"
+
+	// Act: verify with the invalid signature
+	isValid, err := VerifyEtherumMessage(invalidSignature, message, ethService.walletAddress)
+
+	// Assert: verification should fail
+	assert.Error(t, err)
+	assert.False(t, isValid)
+}
+
+func TestVerifyEtherumMessage_InvalidAddress(t *testing.T) {
+	// Test data
+	message := "test message"
+	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	signedMessage, _ := ethService.SignMessage(message)
+
+	// Use an invalid wallet address
+	invalidAddress := "0xInvalidAddress"
+
+	// Act: verify with the invalid address
+	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, invalidAddress)
+
+	// Assert: verification should fail
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid signature")
+	assert.False(t, isValid)
+}
+
+func TestValidateEtherumWallet_Success(t *testing.T) {
+	// Test valid Ethereum wallet address
+	validWallet := "0x225e681f7A54c248340f7e714b25Dc1fFd2Fda0E" // Replace with a valid hex Ethereum address
+
+	// Act: validate the wallet
+	isValid := ValidateEtherumWallet(validWallet)
+
+	// Assert: validation should succeed
+	assert.True(t, isValid)
+}
+
+func TestValidateEtherumWallet_Fail(t *testing.T) {
+	// Test invalid Ethereum wallet address
+	invalidWallet := "0xInvalidEthereumAddress"
+
+	// Act: validate the wallet
+	isValid := ValidateEtherumWallet(invalidWallet)
+
+	// Assert: validation should fail
+	assert.False(t, isValid)
 }

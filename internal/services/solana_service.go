@@ -1,8 +1,6 @@
 package services
 
 import (
-	"encoding/base64"
-	"errors"
 	"fmt"
 	"log"
 
@@ -10,6 +8,7 @@ import (
 
 	"github.com/blocto/solana-go-sdk/types"
 	"github.com/gagliardetto/solana-go"
+	"github.com/mr-tron/base58"
 )
 
 type SolanaService struct {
@@ -35,36 +34,41 @@ func (ss *SolanaService) SignMessage(message string) (WalletSignMessageType, err
 	messageBytes := []byte(message)
 
 	signedMessage := ed25519.Sign(ss.wallet.PrivateKey, messageBytes)
-	signature := base64.StdEncoding.EncodeToString(signedMessage)
-	log.Println(signature)
+	signature := base58.Encode(signedMessage)
+
 	return WalletSignMessageType{
 		Signature:  signature,
 		SigningKey: ss.wallet.PublicKey.ToBase58(),
 	}, nil
 }
 
-func (ss *SolanaService) VerifyMessage(message, signature, publicKey string) (bool, error) {
-	messageBytes := []byte(message)
-	signatureBytes, err := base64.StdEncoding.DecodeString(signature)
+func VerifySolanaMessage(message, signature, publicKey string) (bool, error) {
+	signatureBytes, err := base58.Decode(signature)
 	if err != nil {
-		return false, fmt.Errorf("failed to decode signature: %v", err)
+		return false, fmt.Errorf("failed to decode signature from Base58: %v", err)
 	}
 
-	publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKey)
+	publicKeyBytes, err := base58.Decode(publicKey)
 	if err != nil {
-		return false, fmt.Errorf("failed to decode public key: %v", err)
+		return false, fmt.Errorf("failed to decode public key from Base58: %v", err)
 	}
 
-	isValid := ed25519.Verify(publicKeyBytes, messageBytes, signatureBytes)
+	if len(publicKeyBytes) != ed25519.PublicKeySize {
+		return false, fmt.Errorf("invalid public key length: expected %d bytes, got %d", ed25519.PublicKeySize, len(publicKeyBytes))
+	}
+
+	if len(signatureBytes) != ed25519.SignatureSize {
+		return false, fmt.Errorf("invalid signature length: expected %d bytes, got %d", ed25519.SignatureSize, len(signatureBytes))
+	}
+
+	isValid := ed25519.Verify(publicKeyBytes, []byte(message), signatureBytes)
+
 	return isValid, nil
 }
 
-func (ss *SolanaService) ValidateWallet(wallet string) (string, error) {
-	pubKey, err := solana.PublicKeyFromBase58(wallet)
-	if err != nil {
-		return "", errors.New("invalid wallet address: " + err.Error())
-	}
-	return pubKey.String(), nil
+func ValidateSolanaWallet(wallet string) bool {
+	_, err := solana.PublicKeyFromBase58(wallet)
+	return err == nil
 }
 
 func (ss *SolanaService) GetWallet() string {

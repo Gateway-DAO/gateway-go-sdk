@@ -7,7 +7,6 @@ import (
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
-
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -40,7 +39,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
 
 		// Test
-		token, err := authImpl.Login("test-message", "test-signature", "test-wallet")
+		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
 
 		// Assertions
 		assert.NoError(t, err)
@@ -56,7 +55,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
 
 		// Test
-		token, err := authImpl.Login("test-message", "test-signature", "test-wallet")
+		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
 
 		// Assertions
 		assert.Error(t, err)
@@ -71,7 +70,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.RegisterResponder("POST", common.AuthenticateAccount, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
-		token, err := authImpl.Login("test-message", "test-signature", "test-wallet")
+		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
 
 		// Assertions
 		assert.Error(t, err)
@@ -181,4 +180,4 @@ func TestAuthSuite(t *testing.T) {
 		assert.Error(t, err)
 		assert.Empty(t, token)
 	})
-}
+} // Closing bracket for TestAuthSuite

@@ -2,8 +2,9 @@ package auth
 
 import (
 	"errors"
-	"log"
+	"fmt"
 
+	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
@@ -24,7 +25,25 @@ func NewAuthImpl(config common.SDKConfig) *AuthImpl {
 }
 
 func (u *AuthImpl) Login(message string, signature string, wallet_address string) (string, error) {
-	log.Println(message, signature, wallet_address)
+	var isValid bool
+	var err error
+	if services.ValidateEtherumWallet(wallet_address) {
+		isValid, err = services.VerifyEtherumMessage(signature, message, wallet_address)
+		if err != nil {
+			return "", fmt.Errorf("ethereum signature verification failed: %v", err)
+		}
+		if !isValid {
+			return "", errors.New("invalid Ethereum signature")
+		}
+	} else {
+		isValid, err = services.VerifySolanaMessage(message, signature, wallet_address)
+		if err != nil {
+			return "", fmt.Errorf("solana signature verification failed: %v", err)
+		}
+		if !isValid {
+			return "", errors.New("invalid Solana signature")
+		}
+	}
 	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 
@@ -47,7 +66,6 @@ func (u *AuthImpl) GetMessage() (string, error) {
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetResult(&messageResponse).SetError(&error).Get(common.GenerateSignMessage)
-	log.Println(res)
 	if err != nil {
 		return messageResponse.Message, err
 	}

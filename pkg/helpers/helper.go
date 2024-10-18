@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
@@ -35,7 +34,6 @@ func IssueJWT(client resty.Client, wallet services.Wallet) (string, error) {
 	if messageErr != nil {
 		return "", messageErr
 	}
-	log.Println("in message", message)
 
 	signatureDetails, signingErr := wallet.SignMessage(message)
 	if signingErr != nil {
@@ -54,18 +52,13 @@ var UNPROTECTED_ROUTES = []string{common.GenerateSignMessage,
 
 func AuthMiddleware(params services.MiddlewareParams) resty.RequestMiddleware {
 	return func(c *resty.Client, r *resty.Request) error {
-		log.Println("here", r.URL, UNPROTECTED_ROUTES[2])
-
 		for _, route := range UNPROTECTED_ROUTES {
 			if route == r.URL {
 				return nil
 			}
 		}
 		accessToken := r.Header.Get("Authorization")
-		log.Println("existing token", accessToken)
 		if accessToken == "" {
-			log.Println("empty access token")
-
 			newToken, err := IssueJWT(*params.Client, &params.Wallet)
 			if err != nil {
 				return fmt.Errorf("failed to issue new token: %v", err)
@@ -73,7 +66,6 @@ func AuthMiddleware(params services.MiddlewareParams) resty.RequestMiddleware {
 			accessToken = newToken
 		} else {
 			isValid, _ := CheckJWTTokenExpiration(accessToken)
-			log.Println("in jwt check", isValid)
 
 			if !isValid {
 				newToken, err := IssueJWT(*params.Client, &params.Wallet)

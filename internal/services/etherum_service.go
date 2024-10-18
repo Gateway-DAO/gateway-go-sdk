@@ -55,20 +55,29 @@ func (es *EtherumService) SignMessage(message string) (WalletSignMessageType, er
 	}, nil
 }
 
-func (es *EtherumService) VerifyMessage(signature []byte, message, walletAddress string) (bool, error) {
-	msgHash := crypto.Keccak256Hash([]byte(message))
-
-	publicKey, err := crypto.SigToPub(msgHash.Bytes(), signature)
+func VerifyEtherumMessage(signature string, message, walletAddress string) (bool, error) {
+	signatureHex, err := hexutil.Decode(signature)
 	if err != nil {
-		return false, fmt.Errorf("failed to recover public key: %v", err)
+		return false, err
 	}
 
-	recoveredAddr := crypto.PubkeyToAddress(*publicKey).Hex()
+	signatureHex[crypto.RecoveryIDOffset] -= 27
 
-	return recoveredAddr == walletAddress, nil
+	messageHash := accounts.TextHash([]byte(message))
+
+	pubKey, err := crypto.SigToPub(messageHash, signatureHex)
+	if err != nil {
+		return false, err
+	}
+
+	if common.HexToAddress(walletAddress) != crypto.PubkeyToAddress(*pubKey) {
+		return false, fmt.Errorf("invalid signature")
+	}
+	
+	return true, nil
 }
 
-func (es *EtherumService) ValidateWallet(wallet string) bool {
+func ValidateEtherumWallet(wallet string) bool {
 	return common.IsHexAddress(wallet)
 }
 
