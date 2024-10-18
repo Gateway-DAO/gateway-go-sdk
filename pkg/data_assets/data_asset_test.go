@@ -63,6 +63,19 @@ func TestDataAssetSuite(t *testing.T) {
 		assert.Error(t, err)
 	})
 
+	t.Run("TestGetMeServerError", func(t *testing.T) {
+		fixture := `{"error": "Internal server error"}`
+		httpmock.RegisterResponder("GET", common.GetDataAssetByID,
+			httpmock.NewStringResponder(500, fixture))
+
+		// Call the function
+		assets, err := dataAssetImpl.Get(1)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, assets)
+	})
+
 	t.Run("TestUploadDataAsset", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -124,6 +137,33 @@ func TestDataAssetSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(result.Data))
+	})
+
+	t.Run("TestGetCreatedByMeHttpRequestError", func(t *testing.T) {
+		// Simulate an HTTP request error
+		httpmock.RegisterResponder("GET", common.GetCreatedDataAssets,
+			httpmock.NewErrorResponder(errors.New("http request error")))
+
+		// Call the function
+		assets, err := dataAssetImpl.GetCreatedByMe(1, 10)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, assets)
+	})
+
+	t.Run("TestGetCreatedByMeServerError", func(t *testing.T) {
+		// Setup the fixture for a server error response
+		fixture := `{"error": "Internal server error"}`
+		httpmock.RegisterResponder("GET", common.GetCreatedDataAssets,
+			httpmock.NewStringResponder(500, fixture))
+
+		// Call the function
+		assets, err := dataAssetImpl.GetCreatedByMe(1, 10)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, assets)
 	})
 
 	t.Run("TestGetReceivedByMe", func(t *testing.T) {
