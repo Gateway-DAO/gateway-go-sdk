@@ -19,7 +19,8 @@ type EtherumService struct {
 func NewEtherumService(walletPrivateKey string) *EtherumService {
 	privateKey, err := crypto.HexToECDSA(walletPrivateKey)
 	if err != nil {
-		log.Fatalf("Failed to load private key: %v", err)
+		log.Printf("Failed to load private key: %v", err)
+		panic(err)
 	}
 
 	publicKey := privateKey.Public()
@@ -73,7 +74,7 @@ func VerifyEtherumMessage(signature string, message, walletAddress string) (bool
 	if common.HexToAddress(walletAddress) != crypto.PubkeyToAddress(*pubKey) {
 		return false, fmt.Errorf("invalid signature")
 	}
-	
+
 	return true, nil
 }
 

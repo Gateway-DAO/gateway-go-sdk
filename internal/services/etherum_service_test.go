@@ -96,3 +96,36 @@ func TestValidateEtherumWallet_Fail(t *testing.T) {
 	// Assert: validation should fail
 	assert.False(t, isValid)
 }
+
+func TestGetWallet(t *testing.T) {
+	service := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	wallet := service.GetWallet()
+
+	assert.NotEmpty(t, wallet)
+	assert.Equal(t, service.walletAddress, wallet)
+}
+
+func TestVerifyEtherumMessage_InvalidSignatureHex(t *testing.T) {
+	message := "test-message"
+	walletAddress := "0x225e681f7A54c248340f7e714b25Dc1fFd2Fda0E"
+	invalidSignature := "invalid-signature"
+
+	isValid, err := VerifyEtherumMessage(invalidSignature, message, walletAddress)
+
+	assert.False(t, isValid)
+	assert.Error(t, err)
+}
+
+func TestNewEtherumService_InvalidPrivateKey(t *testing.T) {
+	invalidPrivateKey := "invalid-private-key"
+	assert.Panics(t, func() {
+		NewEtherumService(invalidPrivateKey)
+	}, "Expected panic due to invalid private key")
+}
+
+func TestNewEtherumService_InvalidPublicKey(t *testing.T) {
+	invalidPrivateKey := "your-invalid-private-key"
+	assert.Panics(t, func() {
+		NewEtherumService(invalidPrivateKey)
+	}, "Expected panic due to invalid public key derivation")
+}

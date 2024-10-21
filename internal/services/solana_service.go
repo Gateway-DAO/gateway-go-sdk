@@ -21,7 +21,8 @@ func NewSolanaService(walletPrivateKey string) *SolanaService {
 
 	wallet, err := types.AccountFromBytes(privateKey)
 	if err != nil {
-		log.Fatalf("Failed to create wallet from private key: %v", err)
+		log.Printf("Failed to create wallet from private key: %v", err)
+		panic(err)
 	}
 
 	return &SolanaService{

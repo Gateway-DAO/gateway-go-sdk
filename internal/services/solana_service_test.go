@@ -75,3 +75,18 @@ func TestSignMessage_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, isValid)
 }
+
+
+func TestNewSolanaService_InvalidPrivateKey(t *testing.T) {
+	invalidPrivateKey := "invalid-private-key"
+	assert.Panics(t, func() {
+		NewSolanaService(invalidPrivateKey)
+	}, "Expected panic due to invalid private key")
+}
+
+func TestNewSolanaService_InvalidPublicKey(t *testing.T) {
+	invalidPrivateKey := "your-invalid-private-key"
+	assert.Panics(t, func() {
+		NewSolanaService(invalidPrivateKey)
+	}, "Expected panic due to invalid public key derivation")
+}
