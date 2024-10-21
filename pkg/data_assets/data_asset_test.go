@@ -407,8 +407,8 @@ func TestDataAssetSuite(t *testing.T) {
 		message, err := dataAssetImpl.DeleteAsset(1)
 
 		// Assertions
-		assert.Error(t, err)                               // Expecting an error
-		assert.Empty(t, message)                           // Assert that the message response is empty on error
+		assert.Error(t, err)     // Expecting an error
+		assert.Empty(t, message) // Assert that the message response is empty on error
 	})
 
 	t.Run("TestUploadFileSuccess", func(t *testing.T) {
@@ -454,8 +454,34 @@ func TestDataAssetSuite(t *testing.T) {
 		assert.Empty(t, result.Id)
 	})
 
+	t.Run("TestUpdateFileSuccess", func(t *testing.T) {
+		// Setup
+		httpmock.RegisterResponder("PUT", "/data-assets/123",
+			httpmock.NewJsonResponderOrPanic(200, common.DataAssetIDRequestAndResponse{Id: 123}))
+
+		fixture := `{"id":123}`
+		responder := func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewStringResponse(200, fixture)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		}
+		httpmock.RegisterResponder("PUT", "/data-assets/123", responder)
+
+		// Test
+		expirationDate := time.Now().Add(24 * time.Hour)
+		aclList := []common.ACLRequest{
+			{Address: "test", Roles: []common.AccessLevel{common.RoleShare}},
+		}
+		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("file content"), &aclList, &expirationDate)
+
+		// Assertions
+		assert.NoError(t, err)
+		assert.Equal(t, 123, result.Id)
+	})
+
 	t.Run("TestUpdateFileError", func(t *testing.T) {
 		// Setup
+		httpmock.Reset()
 		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
 			httpmock.NewJsonResponderOrPanic(400, common.Error{Error: "Update failed"}))
 

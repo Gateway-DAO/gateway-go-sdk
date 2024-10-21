@@ -91,6 +91,22 @@ func TestDataModelSuite(t *testing.T) {
 
 	})
 
+	t.Run("TestGetALLError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
+		httpmock.RegisterResponder("GET", common.GetDataModels, responder)
+
+		page, pageSize := 1, 10
+		result, err := dataModelImpl.GetAll(page, pageSize)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result)
+	})
+
 	t.Run("TestGetAllHttpRequestError", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -169,6 +185,22 @@ func TestDataModelSuite(t *testing.T) {
 		assert.Equal(t, 2, result.Meta.TotalItems)
 	})
 
+	t.Run("TestGetMyIDError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
+		httpmock.RegisterResponder("GET", common.GetDataModelsByUser, responder)
+
+		page, pageSize := 1, 10
+		result, err := dataModelImpl.GetMy(page, pageSize)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result)
+	})
+
 	t.Run("TestGetMyHttpRequestError", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -223,6 +255,22 @@ func TestDataModelSuite(t *testing.T) {
 		assert.Equal(t, "Data Model 1", result.Title)
 	})
 
+	t.Run("TestGetByIDError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
+		httpmock.RegisterResponder("GET", "/data-models/1", responder)
+
+		id := int64(1)
+		result, err := dataModelImpl.GetById(id)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result)
+	})
+
 	t.Run("TestGetByIdHttpRequestError", func(t *testing.T) {
 		// Reset mock
 		httpmock.Reset()
@@ -263,6 +311,24 @@ func TestDataModelSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, int(2), result.Id)
+	})
+
+	t.Run("TestCreateError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
+		httpmock.RegisterResponder("POST", common.CreateDataModel, responder)
+
+		dataModelInput := common.DataModelRequest{
+			Title: "NewModel",
+		}
+		result, err := dataModelImpl.Create(dataModelInput)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result)
 	})
 
 	t.Run("TestCreateHttpRequestError", func(t *testing.T) {
@@ -308,6 +374,25 @@ func TestDataModelSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, int(2), result.Id)
+	})
+
+	t.Run("TestUpdateError", func(t *testing.T) {
+		// Reset mock
+		httpmock.Reset()
+
+		// Set up mock response
+		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
+		httpmock.RegisterResponder("PUT", common.UpdateDataModel, responder)
+
+		id := int64(2)
+		dataModelInput := common.DataModelRequest{
+			Title: "UpdatedModel",
+		}
+		result, err := dataModelImpl.Update(id, dataModelInput)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Empty(t, result)
 	})
 
 	t.Run("TestUpdateHttpRequestError", func(t *testing.T) {

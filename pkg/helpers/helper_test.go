@@ -2,6 +2,7 @@ package helpers_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -93,6 +94,57 @@ func TestIssueJWT_Success(t *testing.T) {
 	// Assert the results
 	assert.Error(t, err)
 
+}
+
+func TestIssueJWT_SignMessageError(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	// Mock the wallet to return an error
+	mockWallet := new(MockWallet)
+	mockWallet.On("SignMessage", mock.Anything).Return(services.WalletSignMessageType{}, fmt.Errorf("failed to sign message"))
+
+	// Mock the /auth/message endpoint to return a message
+	fixtureMessage := `"mock-message"`
+	httpmock.RegisterResponder("GET", "=~.*/auth/message", // Adjust this based on actual URL
+		httpmock.NewStringResponder(200, fixtureMessage))
+
+	// Issue JWT
+	_, err := helpers.IssueJWT(*client, mockWallet)
+
+	// Assert that there was an error in signing the message
+	assert.Error(t, err)
+	assert.EqualError(t, err, "failed to sign message")
+}
+
+func TestIssueJWT_LoginError(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	// Mock the wallet to return a valid signature
+	mockWallet := new(MockWallet)
+	mockWallet.On("SignMessage", mock.Anything).Return(services.WalletSignMessageType{
+		Signature:  "mock-signature",
+		SigningKey: "mock-signing-key",
+	}, nil)
+
+	// Mock the /auth/message endpoint to return a message
+	fixtureMessage := `"mock-message"`
+	httpmock.RegisterResponder("GET", "=~.*/auth/message", // Adjust this based on actual URL
+		httpmock.NewStringResponder(200, fixtureMessage))
+
+	// Mock the /auth/login endpoint to return an error
+	httpmock.RegisterResponder("POST", "=~.*/auth/login", // Adjust this if needed
+		httpmock.NewStringResponder(500, `{"error": "internal server error"}`))
+
+	// Issue JWT
+	_, err := helpers.IssueJWT(*client, mockWallet)
+
+	// Assert that there was an error in the login process
+	assert.Error(t, err)
+	assert.EqualError(t, err, "solana signature verification failed: failed to decode signature from Base58: invalid base58 digit ('-')")
 }
 
 func TestIssueJWT_FailSignMessage(t *testing.T) {
