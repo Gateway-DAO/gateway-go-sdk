@@ -90,3 +90,11 @@ func TestNewSolanaService_InvalidPublicKey(t *testing.T) {
 		NewSolanaService(invalidPrivateKey)
 	}, "Expected panic due to invalid public key derivation")
 }
+	
+func TestGeSolanatWallet(t *testing.T) {
+	service := NewSolanaService("T8HMDTLmyQgY6VjvLdEwSSZsexAtiFvfiKBzEsT3ajNQg7jJgnTBK2qDSShz98ND3ihtrwrQcUWokdQr4ozPQt3")
+	wallet := service.GetWallet()
+
+	assert.NotEmpty(t, wallet)
+	assert.Equal(t, "AqzrrxaBCXRsq2BaY32djAp38B42asRRahbsYvD5uvSF", wallet)
+}

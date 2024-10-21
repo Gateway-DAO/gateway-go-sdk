@@ -1,9 +1,11 @@
 package services
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/test-go/testify/mock"
 )
 
 func TestSignMessageEth_Success(t *testing.T) {
@@ -128,4 +130,29 @@ func TestNewEtherumService_InvalidPublicKey(t *testing.T) {
 	assert.Panics(t, func() {
 		NewEtherumService(invalidPrivateKey)
 	}, "Expected panic due to invalid public key derivation")
+}
+
+type MockEtherumService struct {
+	mock.Mock
+}
+
+func (m *MockEtherumService) SignMessage(message string) (WalletSignMessageType, error) {
+	args := m.Called(message)
+	return args.Get(0).(WalletSignMessageType), args.Error(1)
+}
+
+func (m *MockEtherumService) GetWallet() string {
+	args := m.Called()
+	return args.String(0)
+}
+
+func TestSignMessage_SignError(t *testing.T) {
+	mockService := new(MockEtherumService)
+
+	mockService.On("SignMessage", "test-message").Return(WalletSignMessageType{}, fmt.Errorf("failed to sign message"))
+
+	_, err := mockService.SignMessage("test-message")
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "failed to sign message")
 }
