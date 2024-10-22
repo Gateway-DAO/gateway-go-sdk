@@ -82,7 +82,7 @@ func getGoType(schema SwaggerType) string {
 		return "bool"
 	case "array":
 		if schema.Items != nil {
-			itemType := getGoType(*schema.Items) // Recursively call getGoType to handle the item type
+			itemType := getGoType(*schema.Items)
 			return "[]" + itemType
 		}
 		return "[]string"

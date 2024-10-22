@@ -41,7 +41,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -62,7 +62,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -81,7 +81,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -107,7 +107,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -128,7 +128,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -147,7 +147,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -173,7 +173,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -194,7 +194,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}
@@ -214,7 +214,7 @@ func TestACLSuite(t *testing.T) {
 
 		// Test
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{
+			{Address: "test", Roles: []common.TypesAccessLevel{
 				common.RoleShare,
 			}},
 		}

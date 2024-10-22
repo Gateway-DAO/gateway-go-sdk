@@ -93,5 +93,4 @@ func (u *AuthImpl) GetRefreshToken() (string, error) {
 	}
 
 	return jwtTokenResponse.Token, nil
-
 }

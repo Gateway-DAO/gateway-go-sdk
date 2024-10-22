@@ -8,11 +8,11 @@ import (
 )
 
 type DataModel interface {
-	GetAll(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModel], error)
-	Create(dataModelInput common.DataModelRequest) (common.DataModel, error)
-	GetMy(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModel], error)
-	GetById(id int64) (common.DataModel, error)
-	Update(id int64, dataModelInput common.DataModelRequest) (common.DataModel, error)
+	GetAll(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModelResponse], error)
+	Create(dataModelInput common.DataModelCreateRequest) (common.DataModelResponse, error)
+	GetMy(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModelResponse], error)
+	GetById(id int64) (common.DataModelResponse, error)
+	Update(id int64, dataModelInput common.DataModelUpdateRequest) (common.DataModelResponse, error)
 }
 
 type DataModelImpl struct {
@@ -25,9 +25,9 @@ func NewDataModelImpl(config common.SDKConfig) *DataModelImpl {
 	}
 }
 
-func (u *DataModelImpl) GetAll(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModel], error) {
+func (u *DataModelImpl) GetAll(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModelResponse], error) {
 
-	var dataModels common.HelperPaginatedResponse[[]common.DataModel]
+	var dataModels common.HelperPaginatedResponse[[]common.DataModelResponse]
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetQueryParams(map[string]string{
@@ -46,8 +46,8 @@ func (u *DataModelImpl) GetAll(page int, page_size int) (common.HelperPaginatedR
 	return dataModels, nil
 }
 
-func (u *DataModelImpl) GetMy(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModel], error) {
-	var dataModels common.HelperPaginatedResponse[[]common.DataModel]
+func (u *DataModelImpl) GetMy(page int, page_size int) (common.HelperPaginatedResponse[[]common.DataModelResponse], error) {
+	var dataModels common.HelperPaginatedResponse[[]common.DataModelResponse]
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetQueryParams(map[string]string{
@@ -66,9 +66,9 @@ func (u *DataModelImpl) GetMy(page int, page_size int) (common.HelperPaginatedRe
 	return dataModels, nil
 }
 
-func (u *DataModelImpl) GetById(id int64) (common.DataModel, error) {
+func (u *DataModelImpl) GetById(id int64) (common.DataModelResponse, error) {
 
-	var dataModel common.DataModel
+	var dataModel common.DataModelResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%d", id)).SetResult(&dataModel).SetError(&error).Get(common.GetDataModelByID)
@@ -85,8 +85,8 @@ func (u *DataModelImpl) GetById(id int64) (common.DataModel, error) {
 
 }
 
-func (u *DataModelImpl) Create(dataModelInput common.DataModelRequest) (common.DataModel, error) {
-	var dataModelCreated common.DataModel
+func (u *DataModelImpl) Create(dataModelInput common.DataModelCreateRequest) (common.DataModelResponse, error) {
+	var dataModelCreated common.DataModelResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetBody(&dataModelInput).SetResult(&dataModelCreated).SetError(&error).Post(common.CreateDataModel)
@@ -102,8 +102,8 @@ func (u *DataModelImpl) Create(dataModelInput common.DataModelRequest) (common.D
 	return dataModelCreated, nil
 }
 
-func (u *DataModelImpl) Update(id int64, dataModelInput common.DataModelRequest) (common.DataModel, error) {
-	var dataModelUpdated common.DataModel
+func (u *DataModelImpl) Update(id int64, dataModelInput common.DataModelUpdateRequest) (common.DataModelResponse, error) {
+	var dataModelUpdated common.DataModelResponse
 	var error common.Error
 
 	res, err := u.Config.Client.R().SetBody(&dataModelInput).SetResult(&dataModelUpdated).SetError(&error).Put(common.UpdateDataModel)

@@ -419,7 +419,7 @@ func TestDataAssetSuite(t *testing.T) {
 		// Test
 		expirationDate := time.Now().Add(24 * time.Hour)
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{common.RoleShare}},
+			{Address: "test", Roles: []common.TypesAccessLevel{common.RoleShare}},
 		}
 		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), &aclList, &expirationDate)
 
@@ -470,7 +470,7 @@ func TestDataAssetSuite(t *testing.T) {
 		// Test
 		expirationDate := time.Now().Add(24 * time.Hour)
 		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.AccessLevel{common.RoleShare}},
+			{Address: "test", Roles: []common.TypesAccessLevel{common.RoleShare}},
 		}
 		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("file content"), &aclList, &expirationDate)
 

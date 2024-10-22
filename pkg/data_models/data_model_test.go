@@ -86,9 +86,6 @@ func TestDataModelSuite(t *testing.T) {
 		assert.Len(t, response.Data, 2)
 		assert.Equal(t, "Data Model 1", response.Data[0].Title)
 		assert.Equal(t, "Data Model 2", response.Data[1].Title)
-		assert.Equal(t, "user1", response.Data[0].CreatedBy)
-		assert.Equal(t, "user2", response.Data[1].CreatedBy)
-
 	})
 
 	t.Run("TestGetALLError", func(t *testing.T) {
@@ -251,7 +248,6 @@ func TestDataModelSuite(t *testing.T) {
 		// Assertions
 		assert.NoError(t, err)
 		assert.Equal(t, int(1), result.Id)
-		assert.Equal(t, "user1", result.CreatedBy)
 		assert.Equal(t, "Data Model 1", result.Title)
 	})
 
@@ -303,7 +299,7 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.RegisterResponder("POST", common.CreateDataModel, responder)
 
 		// Test
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -321,7 +317,7 @@ func TestDataModelSuite(t *testing.T) {
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
 		httpmock.RegisterResponder("POST", common.CreateDataModel, responder)
 
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -341,7 +337,7 @@ func TestDataModelSuite(t *testing.T) {
 		})
 
 		// Test
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -366,7 +362,7 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Test
 		id := int64(2)
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
@@ -385,7 +381,7 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", common.UpdateDataModel, responder)
 
 		id := int64(2)
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
@@ -406,7 +402,7 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Test
 		id := int64(2)
-		dataModelInput := common.DataModelRequest{
+		dataModelInput := common.DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)

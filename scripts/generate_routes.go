@@ -37,7 +37,7 @@ func parameterizePath(path string) string {
 }
 
 func ToPascalCase(s string) string {
-	s = strings.TrimPrefix(s, "model.")
+	s = strings.TrimPrefix(s, "dto.")
 
 	var sb strings.Builder
 	uppercaseNext := true
