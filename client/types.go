@@ -1,13 +1,13 @@
-package common
+package client
 
 import "github.com/go-resty/resty/v2"
 
 type WalletSignMessageType struct {
-	Signature  []byte
+	Signature  string
 	SigningKey string
 }
 
-type SDKConfig struct {
+type Config struct {
 	Client *resty.Client
 }
 

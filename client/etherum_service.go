@@ -1,4 +1,4 @@
-package services
+package client
 
 import (
 	"crypto/ecdsa"
@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
+	common "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )

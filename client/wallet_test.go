@@ -1,4 +1,4 @@
-package accounts_test
+package client_test
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestWalletImpl(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -30,7 +29,7 @@ func TestWalletImpl(t *testing.T) {
 
 		// Set up mock response
 		fixture := `{"username": "testuser", "WalletAddresses": ["0xTestAddress"]}`
-		httpmock.RegisterResponder("POST", common.AddWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", AddWallet, func(req *http.Request) (*http.Response, error) {
 			resp := httpmock.NewStringResponse(200, fixture)
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
@@ -51,7 +50,7 @@ func TestWalletImpl(t *testing.T) {
 
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to add wallet"}`
-		httpmock.RegisterResponder("POST", common.AddWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", AddWallet, func(req *http.Request) (*http.Response, error) {
 			resp := httpmock.NewStringResponse(400, errorResponse)
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
@@ -70,7 +69,7 @@ func TestWalletImpl(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("POST", common.AddWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", AddWallet, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
@@ -88,7 +87,7 @@ func TestWalletImpl(t *testing.T) {
 
 		// Set up mock response
 		fixture := `{"username": "testuser", "wallets": []}`
-		httpmock.RegisterResponder("DELETE", common.RemoveWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("DELETE", RemoveWallet, func(req *http.Request) (*http.Response, error) {
 			resp := httpmock.NewStringResponse(200, fixture)
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
@@ -108,7 +107,7 @@ func TestWalletImpl(t *testing.T) {
 
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to remove wallet"}`
-		httpmock.RegisterResponder("DELETE", common.RemoveWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("DELETE", RemoveWallet, func(req *http.Request) (*http.Response, error) {
 			resp := httpmock.NewStringResponse(400, errorResponse)
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
@@ -127,7 +126,7 @@ func TestWalletImpl(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("DELETE", common.RemoveWallet, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("DELETE", RemoveWallet, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 

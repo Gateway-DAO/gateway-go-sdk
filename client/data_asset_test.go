@@ -1,4 +1,4 @@
-package dataassets_test
+package client_test
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 	dataassets "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_assets"
 
 	"github.com/go-resty/resty/v2"
@@ -20,7 +19,7 @@ func TestDataAssetSuite(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -49,7 +48,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestGetDataAssetHttpRequestError", func(t *testing.T) {
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("GET", common.GetDataAssetByID,
+		httpmock.RegisterResponder("GET", GetDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Call the function
@@ -71,10 +70,10 @@ func TestDataAssetSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset, responder)
+		httpmock.RegisterResponder("POST", CreateANewDataAsset, responder)
 
 		// Test
-		input := common.CreateDataAssetRequest{
+		input := CreateDataAssetRequest{
 			Name: "New Asset",
 		}
 		result, err := dataAssetImpl.Upload(input)
@@ -90,10 +89,10 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid data asset request"}`)
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset, responder)
+		httpmock.RegisterResponder("POST", CreateANewDataAsset, responder)
 
 		// Test
-		input := common.CreateDataAssetRequest{
+		input := CreateDataAssetRequest{
 			Name: "New Asset",
 		}
 		_, err := dataAssetImpl.Upload(input)
@@ -104,10 +103,10 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestUploadDataAssetHttpRequestError", func(t *testing.T) {
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+		httpmock.RegisterResponder("POST", CreateANewDataAsset,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
-		input := common.CreateDataAssetRequest{
+		input := CreateDataAssetRequest{
 			Name: "New Asset",
 		}
 		// Call the Upload method
@@ -129,7 +128,7 @@ func TestDataAssetSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GetCreatedDataAssets, responder)
+		httpmock.RegisterResponder("GET", GetCreatedDataAssets, responder)
 
 		// Test
 		result, err := dataAssetImpl.GetCreatedByMe(1, 10)
@@ -141,7 +140,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestGetCreatedByMeHttpRequestError", func(t *testing.T) {
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("GET", common.GetCreatedDataAssets,
+		httpmock.RegisterResponder("GET", GetCreatedDataAssets,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Call the function
@@ -155,7 +154,7 @@ func TestDataAssetSuite(t *testing.T) {
 	t.Run("TestGetCreatedByMeServerError", func(t *testing.T) {
 		// Setup the fixture for a server error response
 		fixture := `{"error": "Internal server error"}`
-		httpmock.RegisterResponder("GET", common.GetCreatedDataAssets,
+		httpmock.RegisterResponder("GET", GetCreatedDataAssets,
 			httpmock.NewStringResponder(500, fixture))
 
 		// Call the function
@@ -177,7 +176,7 @@ func TestDataAssetSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GetReceivedDataAssets, responder)
+		httpmock.RegisterResponder("GET", GetReceivedDataAssets, responder)
 
 		// Test
 		result, err := dataAssetImpl.GetReceivedByMe(1, 10)
@@ -189,7 +188,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestGetReceivedByMeHttpRequestError", func(t *testing.T) {
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("GET", common.GetReceivedDataAssets,
+		httpmock.RegisterResponder("GET", GetReceivedDataAssets,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Call the function
@@ -203,7 +202,7 @@ func TestDataAssetSuite(t *testing.T) {
 	t.Run("TestGetReceivedByMeServerError", func(t *testing.T) {
 		// Setup the fixture for a server error response
 		fixture := `{"error": "Internal server error"}`
-		httpmock.RegisterResponder("GET", common.GetReceivedDataAssets,
+		httpmock.RegisterResponder("GET", GetReceivedDataAssets,
 			httpmock.NewStringResponder(500, fixture))
 
 		// Call the function
@@ -228,7 +227,7 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", "/data-assets/1", responder)
 
 		// Test
-		input := common.UpdateDataAssetRequest{
+		input := UpdateDataAssetRequest{
 			Name: "New Asset",
 		}
 		result, err := dataAssetImpl.UpdateAsset("1", input)
@@ -243,10 +242,10 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Simulate an API error response
 		fixture := `{"error": "Internal server error"}`
-		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+		httpmock.RegisterResponder("PUT", UpdateDataAssetByID,
 			httpmock.NewStringResponder(500, fixture))
 
-		input := common.UpdateDataAssetRequest{
+		input := UpdateDataAssetRequest{
 			Name: "New Asset",
 		}
 		// Call the UpdateAsset method
@@ -261,10 +260,10 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+		httpmock.RegisterResponder("PUT", UpdateDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
-		input := common.UpdateDataAssetRequest{
+		input := UpdateDataAssetRequest{
 			Name: "New Asset",
 		}
 		// Call the UpdateAsset method
@@ -301,10 +300,10 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Set up mock response
-		httpmock.RegisterResponder("GET", common.DownloadDataAssetByID, httpmock.NewStringResponder(200, ""))
+		httpmock.RegisterResponder("GET", DownloadDataAssetByID, httpmock.NewStringResponder(200, ""))
 
 		fixture := "File content goes here" // Replace with actual file content if needed
-		httpmock.RegisterResponder("GET", common.DownloadDataAssetByID, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("GET", DownloadDataAssetByID, func(req *http.Request) (*http.Response, error) {
 			resp := httpmock.NewStringResponse(200, fixture)
 			resp.Header.Set("Content-Disposition", `attachment; filename="testfile.txt"`)
 			return resp, nil
@@ -332,7 +331,7 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.RegisterResponder("POST", "/data-assets/1/share", responder)
 
 		// Test
-		shareDetails := []common.ShareDataAssetRequest{
+		shareDetails := []ShareDataAssetRequest{
 			{Addresses: []string{"test"}},
 		}
 		result, err := dataAssetImpl.Share(1, shareDetails)
@@ -346,10 +345,10 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("POST", common.ShareDataAssetByID,
+		httpmock.RegisterResponder("POST", ShareDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
-		shareDetails := []common.ShareDataAssetRequest{
+		shareDetails := []ShareDataAssetRequest{
 			{Addresses: []string{"test"}},
 		}
 		// Call the Share method
@@ -365,10 +364,10 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Simulate an API error response
 		fixture := `{"error": "Internal server error"}`
-		httpmock.RegisterResponder("POST", common.ShareDataAssetByID,
+		httpmock.RegisterResponder("POST", ShareDataAssetByID,
 			httpmock.NewStringResponder(500, fixture))
 
-		shareDetails := []common.ShareDataAssetRequest{
+		shareDetails := []ShareDataAssetRequest{
 			{Addresses: []string{"test"}},
 		}
 		// Call the Share method
@@ -384,7 +383,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Simulate an API error response
 		fixture := `{"error": "Asset not found"}`
-		httpmock.RegisterResponder("DELETE", common.DeleteDataAssetByID,
+		httpmock.RegisterResponder("DELETE", DeleteDataAssetByID,
 			httpmock.NewStringResponder(404, fixture))
 
 		// Call the DeleteAsset method
@@ -399,7 +398,7 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate an HTTP request error
-		httpmock.RegisterResponder("DELETE", common.DeleteDataAssetByID,
+		httpmock.RegisterResponder("DELETE", DeleteDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Call the DeleteAsset method
@@ -412,13 +411,13 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestUploadFileSuccess", func(t *testing.T) {
 		// Setup
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
-			httpmock.NewJsonResponderOrPanic(200, common.DataAssetIDRequestAndResponse{Id: 123}))
+		httpmock.RegisterResponder("POST", CreateANewDataAsset,
+			httpmock.NewJsonResponderOrPanic(200, DataAssetIDRequestAndResponse{Id: 123}))
 
 		// Test
 		expirationDate := time.Now().Add(24 * time.Hour)
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{common.RoleShare}},
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{RoleShare}},
 		}
 		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), &aclList, &expirationDate)
 
@@ -429,8 +428,8 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestUploadFileError", func(t *testing.T) {
 		// Setup
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
-			httpmock.NewJsonResponderOrPanic(400, common.Error{Error: "Upload failed"}))
+		httpmock.RegisterResponder("POST", CreateANewDataAsset,
+			httpmock.NewJsonResponderOrPanic(400, Error{Error: "Upload failed"}))
 
 		// Test
 		result, err := dataAssetImpl.UploadFile("testfile.txt", []byte("file content"), nil, nil)
@@ -442,7 +441,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestUploadFileHttpRequestError", func(t *testing.T) {
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("POST", common.CreateANewDataAsset,
+		httpmock.RegisterResponder("POST", CreateANewDataAsset,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
@@ -456,7 +455,7 @@ func TestDataAssetSuite(t *testing.T) {
 	t.Run("TestUpdateFileSuccess", func(t *testing.T) {
 		// Setup
 		httpmock.RegisterResponder("PUT", "/data-assets/123",
-			httpmock.NewJsonResponderOrPanic(200, common.DataAssetIDRequestAndResponse{Id: 123}))
+			httpmock.NewJsonResponderOrPanic(200, DataAssetIDRequestAndResponse{Id: 123}))
 
 		fixture := `{"id":123}`
 		responder := func(req *http.Request) (*http.Response, error) {
@@ -468,8 +467,8 @@ func TestDataAssetSuite(t *testing.T) {
 
 		// Test
 		expirationDate := time.Now().Add(24 * time.Hour)
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{common.RoleShare}},
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{RoleShare}},
 		}
 		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("file content"), &aclList, &expirationDate)
 
@@ -481,8 +480,8 @@ func TestDataAssetSuite(t *testing.T) {
 	t.Run("TestUpdateFileError", func(t *testing.T) {
 		// Setup
 		httpmock.Reset()
-		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
-			httpmock.NewJsonResponderOrPanic(400, common.Error{Error: "Update failed"}))
+		httpmock.RegisterResponder("PUT", UpdateDataAssetByID,
+			httpmock.NewJsonResponderOrPanic(400, Error{Error: "Update failed"}))
 
 		// Test
 		result, err := dataAssetImpl.UpdateFile("123", "testfile.txt", []byte("new content"), nil, nil)
@@ -494,7 +493,7 @@ func TestDataAssetSuite(t *testing.T) {
 
 	t.Run("TestUpdateFileHttpRequestError", func(t *testing.T) {
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("PUT", common.UpdateDataAssetByID,
+		httpmock.RegisterResponder("PUT", UpdateDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test

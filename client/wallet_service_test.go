@@ -1,4 +1,4 @@
-package services
+package client_test
 
 import (
 	"testing"

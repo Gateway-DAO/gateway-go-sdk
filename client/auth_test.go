@@ -1,12 +1,11 @@
-package auth_test
+package client_test
 
 import (
 	"errors"
 	"net/http"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/auth"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestAuthSuite(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -35,7 +34,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
+		httpmock.RegisterResponder("POST", AuthenticateAccount, responder)
 
 		// Test
 		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
@@ -56,7 +55,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
+		httpmock.RegisterResponder("POST", AuthenticateAccount, responder)
 
 		// Test
 		_, err := authImpl.Login("test", "0x1bd287faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
@@ -76,7 +75,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
+		httpmock.RegisterResponder("POST", AuthenticateAccount, responder)
 
 		// Test
 		token, err := authImpl.Login("test", "4mWRM4VmpkJ4uSCAYTFjYuCZRLD5BGs7gwyrRckCGnF7HZkjdUXJRX7bBXnTpuyiWi2BYvPaTQB9QGHFw9jeTdwT", "AqzrrxaBCXRsq2BaY32djAp38B42asRRahbsYvD5uvSF")
@@ -97,7 +96,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
+		httpmock.RegisterResponder("POST", AuthenticateAccount, responder)
 
 		// Test
 		_, err := authImpl.Login("test", "mWRM4VmpkJ4uSCAYTFjYuCZRLD5BGs7gwyrRckCGnF7HZkjdUXJRX7bBXnTpuyiWi2BYvPaTQB9QGHFw9jeTdwT", "AqzrrxaBCXRsq2BaY32djAp38B42asRRahbsYvD5uvSF")
@@ -112,7 +111,7 @@ func TestAuthSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, responder)
+		httpmock.RegisterResponder("POST", AuthenticateAccount, responder)
 
 		// Test
 		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
@@ -127,7 +126,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("POST", common.AuthenticateAccount, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("POST", AuthenticateAccount, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
 		token, err := authImpl.Login("test", "0x1bd2387faf757527cd96d0461bd3012fec227c0b85045169b3e2d4fbc8b9a2c55580db184c33a3810404aa1787151e28e647847a8dfd4d3195c64749494d18421b", "0x125b968F9ac42F33b0e1f1FBEbeE016Ca24A7116")
@@ -148,7 +147,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GenerateSignMessage, responder)
+		httpmock.RegisterResponder("GET", GenerateSignMessage, responder)
 
 		// Test
 		message, err := authImpl.GetMessage()
@@ -164,7 +163,7 @@ func TestAuthSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
-		httpmock.RegisterResponder("GET", common.GenerateSignMessage, responder)
+		httpmock.RegisterResponder("GET", GenerateSignMessage, responder)
 
 		// Test
 		message, err := authImpl.GetMessage()
@@ -179,7 +178,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("GET", common.GenerateSignMessage, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("GET", GenerateSignMessage, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
 		message, err := authImpl.GetMessage()
@@ -200,7 +199,7 @@ func TestAuthSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.RefreshToken, responder)
+		httpmock.RegisterResponder("GET", RefreshToken, responder)
 
 		// Test
 		token, err := authImpl.GetRefreshToken()
@@ -216,7 +215,7 @@ func TestAuthSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid credentials"}`)
-		httpmock.RegisterResponder("GET", common.RefreshToken, responder)
+		httpmock.RegisterResponder("GET", RefreshToken, responder)
 
 		// Test
 		token, err := authImpl.GetRefreshToken()
@@ -231,7 +230,7 @@ func TestAuthSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("GET", common.RefreshToken, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("GET", RefreshToken, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
 		token, err := authImpl.GetRefreshToken()

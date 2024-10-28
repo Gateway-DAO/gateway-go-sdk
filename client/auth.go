@@ -1,11 +1,8 @@
-package auth
+package client
 
 import (
 	"errors"
 	"fmt"
-
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
 type Auth interface {
@@ -15,10 +12,10 @@ type Auth interface {
 }
 
 type AuthImpl struct {
-	Config common.SDKConfig
+	Config Config
 }
 
-func NewAuthImpl(config common.SDKConfig) *AuthImpl {
+func NewAuthImpl(config Config) *AuthImpl {
 	return &AuthImpl{
 		Config: config,
 	}
@@ -27,16 +24,16 @@ func NewAuthImpl(config common.SDKConfig) *AuthImpl {
 func (u *AuthImpl) Login(message string, signature string, wallet_address string) (string, error) {
 	var isValid bool
 	var err error
-	if services.ValidateEtherumWallet(wallet_address) {
-		isValid, err = services.VerifyEtherumMessage(signature, message, wallet_address)
+	if ValidateEtherumWallet(wallet_address) {
+		isValid, err = VerifyEtherumMessage(signature, message, wallet_address)
 		if err != nil {
 			return "", fmt.Errorf("ethereum signature verification failed: %v", err)
 		}
 		if !isValid {
 			return "", errors.New("invalid Ethereum signature")
 		}
-	} else if services.ValidateSuiWallet(wallet_address) {
-		isValid, err = services.VerifySuiMessage(message, signature, wallet_address)
+	} else if ValidateSuiWallet(wallet_address) {
+		isValid, err = VerifySuiMessage(message, signature, wallet_address)
 		if err != nil {
 			return "", fmt.Errorf("sui signature verification failed: %v", err)
 		}
@@ -45,7 +42,7 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 		}
 
 	} else {
-		isValid, err = services.VerifySolanaMessage(message, signature, wallet_address)
+		isValid, err = VerifySolanaMessage(message, signature, wallet_address)
 		if err != nil {
 			return "", fmt.Errorf("solana signature verification failed: %v", err)
 		}
@@ -54,10 +51,10 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 		}
 	}
 
-	var jwtTokenResponse common.TokenResponse
-	var error common.Error
+	var jwtTokenResponse TokenResponse
+	var error Error
 
-	res, err := u.Config.Client.R().SetBody(&common.AuthRequest{Message: message, Signature: signature, WalletAddress: wallet_address}).SetResult(&jwtTokenResponse).SetError(&error).Post(common.AuthenticateAccount)
+	res, err := u.Config.Client.R().SetBody(&AuthRequest{Message: message, Signature: signature, WalletAddress: wallet_address}).SetResult(&jwtTokenResponse).SetError(&error).Post(AuthenticateAccount)
 
 	if err != nil {
 		return jwtTokenResponse.Token, err
@@ -72,10 +69,10 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 
 func (u *AuthImpl) GetMessage() (string, error) {
 
-	var messageResponse common.MessageResponse
-	var error common.Error
+	var messageResponse MessageResponse
+	var error Error
 
-	res, err := u.Config.Client.R().SetResult(&messageResponse).SetError(&error).Get(common.GenerateSignMessage)
+	res, err := u.Config.Client.R().SetResult(&messageResponse).SetError(&error).Get(GenerateSignMessage)
 	if err != nil {
 		return messageResponse.Message, err
 	}
@@ -89,10 +86,10 @@ func (u *AuthImpl) GetMessage() (string, error) {
 
 func (u *AuthImpl) GetRefreshToken() (string, error) {
 
-	var jwtTokenResponse common.TokenResponse
-	var error common.Error
+	var jwtTokenResponse TokenResponse
+	var error Error
 
-	res, err := u.Config.Client.R().SetResult(&jwtTokenResponse).SetError(&error).Get(common.RefreshToken)
+	res, err := u.Config.Client.R().SetResult(&jwtTokenResponse).SetError(&error).Get(RefreshToken)
 
 	if err != nil {
 		return jwtTokenResponse.Token, err

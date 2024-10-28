@@ -1,13 +1,11 @@
-package accounts_test
+package client_test
 
 import (
 	"errors"
 	"net/http"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
-
+	"github.com/Gateway-DAO/gateway-go-sdk/client/accounts"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +17,7 @@ func TestAccountsImpl(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -36,10 +34,10 @@ func TestAccountsImpl(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.CreateAccount, responder)
+		httpmock.RegisterResponder("POST", CreateAccount, responder)
 
 		// Test
-		accountDetails := common.AccountCreateRequest{
+		accountDetails := AccountCreateRequest{
 			Signature:     "test",
 			WalletAddress: "test",
 			Message:       "test",
@@ -57,10 +55,10 @@ func TestAccountsImpl(t *testing.T) {
 
 		// Set up mock response for error
 		errorResponse := `{"error": "Account creation failed"}`
-		httpmock.RegisterResponder("POST", common.CreateAccount, httpmock.NewStringResponder(400, errorResponse))
+		httpmock.RegisterResponder("POST", CreateAccount, httpmock.NewStringResponder(400, errorResponse))
 
 		// Test
-		accountDetails := common.AccountCreateRequest{
+		accountDetails := AccountCreateRequest{
 			Signature:     "test",
 			WalletAddress: "test",
 			Message:       "test",
@@ -77,12 +75,12 @@ func TestAccountsImpl(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("POST", common.CreateAccount, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", CreateAccount, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
 		// Test
-		accountDetails := common.AccountCreateRequest{
+		accountDetails := AccountCreateRequest{
 			Signature:     "test",
 			WalletAddress: "test",
 			Message:       "test",
@@ -105,7 +103,7 @@ func TestAccountsImpl(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GetMyAccount, responder)
+		httpmock.RegisterResponder("GET", GetMyAccount, responder)
 
 		// Test
 		myAccount, err := accountImpl.GetMe()
@@ -121,7 +119,7 @@ func TestAccountsImpl(t *testing.T) {
 
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to get account"}`
-		httpmock.RegisterResponder("GET", common.GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
+		httpmock.RegisterResponder("GET", GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
 
 		// Test
 		myAccount, err := accountImpl.GetMe()
@@ -136,7 +134,7 @@ func TestAccountsImpl(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("POST", common.GetMyAccount, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", GetMyAccount, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
@@ -159,10 +157,10 @@ func TestAccountsImpl(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("PATCH", common.GetMyAccount, responder)
+		httpmock.RegisterResponder("PATCH", GetMyAccount, responder)
 
 		// Test
-		updateDetails := common.AccountUpdateRequest{
+		updateDetails := AccountUpdateRequest{
 			ProfilePicture: "test",
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)
@@ -178,10 +176,10 @@ func TestAccountsImpl(t *testing.T) {
 
 		// Set up mock response for error
 		errorResponse := `{"error": "Failed to update account"}`
-		httpmock.RegisterResponder("PATCH", common.GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
+		httpmock.RegisterResponder("PATCH", GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
 
 		// Test
-		updateDetails := common.AccountUpdateRequest{
+		updateDetails := AccountUpdateRequest{
 			ProfilePicture: "test",
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)
@@ -196,12 +194,12 @@ func TestAccountsImpl(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("PATCH", common.GetMyAccount, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("PATCH", GetMyAccount, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
 		// Test
-		updateDetails := common.AccountUpdateRequest{
+		updateDetails := AccountUpdateRequest{
 			ProfilePicture: "test",
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)

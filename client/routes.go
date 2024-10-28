@@ -1,4 +1,4 @@
-package common
+package client
 
 const (
 	AddWallet = "/accounts/me/wallets"

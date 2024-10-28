@@ -1,4 +1,4 @@
-package services
+package client
 
 import (
 	"crypto/ed25519"

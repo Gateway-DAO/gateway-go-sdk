@@ -1,11 +1,10 @@
-package dataassets_test
+package client_test
 
 import (
 	"errors"
 	"net/http"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 	dataassets "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_assets"
 
 	"github.com/go-resty/resty/v2"
@@ -19,7 +18,7 @@ func TestACLSuite(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -36,12 +35,12 @@ func TestACLSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.AssignACLItemsToDataAsset, responder)
+		httpmock.RegisterResponder("POST", AssignACLItemsToDataAsset, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		result, err := aclImpl.Add(1, aclList)
@@ -57,12 +56,12 @@ func TestACLSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid ACL request"}`)
-		httpmock.RegisterResponder("POST", common.AssignACLItemsToDataAsset, responder)
+		httpmock.RegisterResponder("POST", AssignACLItemsToDataAsset, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		_, err := aclImpl.Add(1, aclList)
@@ -76,12 +75,12 @@ func TestACLSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("POST", common.AssignACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("POST", AssignACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		_, err := aclImpl.Add(1, aclList)
@@ -102,12 +101,12 @@ func TestACLSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("PUT", common.UpdateACLItemsToDataAsset, responder)
+		httpmock.RegisterResponder("PUT", UpdateACLItemsToDataAsset, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		result, err := aclImpl.Update(1, aclList)
@@ -123,12 +122,12 @@ func TestACLSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Invalid ACL update"}`)
-		httpmock.RegisterResponder("PUT", common.UpdateACLItemsToDataAsset, responder)
+		httpmock.RegisterResponder("PUT", UpdateACLItemsToDataAsset, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		_, err := aclImpl.Update(1, aclList)
@@ -142,12 +141,12 @@ func TestACLSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("PUT", common.UpdateACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("PUT", UpdateACLItemsToDataAsset, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		_, err := aclImpl.Update(1, aclList)
@@ -168,12 +167,12 @@ func TestACLSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("DELETE", common.DeleteAssignedRoleByACL, responder)
+		httpmock.RegisterResponder("DELETE", DeleteAssignedRoleByACL, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		message, err := aclImpl.Delete(1, aclList)
@@ -189,12 +188,12 @@ func TestACLSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
-		httpmock.RegisterResponder("DELETE", common.DeleteAssignedRoleByACL, responder)
+		httpmock.RegisterResponder("DELETE", DeleteAssignedRoleByACL, responder)
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		message, err := aclImpl.Delete(1, aclList)
@@ -209,12 +208,12 @@ func TestACLSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Register an error responder to simulate HTTP request error
-		httpmock.RegisterResponder("DELETE", common.DeleteAssignedRoleByACL, httpmock.NewErrorResponder(errors.New("http request error")))
+		httpmock.RegisterResponder("DELETE", DeleteAssignedRoleByACL, httpmock.NewErrorResponder(errors.New("http request error")))
 
 		// Test
-		aclList := []common.ACLRequest{
-			{Address: "test", Roles: []common.TypesAccessLevel{
-				common.RoleShare,
+		aclList := []ACLRequest{
+			{Address: "test", Roles: []TypesAccessLevel{
+				RoleShare,
 			}},
 		}
 		message, err := aclImpl.Delete(1, aclList)

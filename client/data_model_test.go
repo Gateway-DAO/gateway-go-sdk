@@ -1,11 +1,10 @@
-package datamodels_test
+package client_test
 
 import (
 	"errors"
 	"net/http"
 	"testing"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 	datamodels "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_models"
 
 	"github.com/go-resty/resty/v2"
@@ -19,7 +18,7 @@ func TestDataModelSuite(t *testing.T) {
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
 
-	config := common.SDKConfig{
+	config := SDKConfig{
 		Client: client,
 	}
 
@@ -74,7 +73,7 @@ func TestDataModelSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GetDataModels, responder)
+		httpmock.RegisterResponder("GET", GetDataModels, responder)
 
 		// Test
 		page, pageSize := 1, 10
@@ -93,7 +92,7 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
-		httpmock.RegisterResponder("GET", common.GetDataModels, responder)
+		httpmock.RegisterResponder("GET", GetDataModels, responder)
 
 		page, pageSize := 1, 10
 		result, err := dataModelImpl.GetAll(page, pageSize)
@@ -108,7 +107,7 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error (e.g., network error)
-		httpmock.RegisterResponder("GET", common.GetDataModels, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("GET", GetDataModels, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
@@ -170,7 +169,7 @@ func TestDataModelSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("GET", common.GetDataModelsByUser, responder)
+		httpmock.RegisterResponder("GET", GetDataModelsByUser, responder)
 
 		// Test
 		page, pageSize := 1, 10
@@ -187,7 +186,7 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
-		httpmock.RegisterResponder("GET", common.GetDataModelsByUser, responder)
+		httpmock.RegisterResponder("GET", GetDataModelsByUser, responder)
 
 		page, pageSize := 1, 10
 		result, err := dataModelImpl.GetMy(page, pageSize)
@@ -202,7 +201,7 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error
-		httpmock.RegisterResponder("GET", common.GetDataModelsByUser, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("GET", GetDataModelsByUser, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
@@ -295,10 +294,10 @@ func TestDataModelSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("POST", common.CreateDataModel, responder)
+		httpmock.RegisterResponder("POST", CreateDataModel, responder)
 
 		// Test
-		dataModelInput := common.DataModelCreateRequest{
+		dataModelInput := DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -314,9 +313,9 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
-		httpmock.RegisterResponder("POST", common.CreateDataModel, responder)
+		httpmock.RegisterResponder("POST", CreateDataModel, responder)
 
-		dataModelInput := common.DataModelCreateRequest{
+		dataModelInput := DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -331,12 +330,12 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error
-		httpmock.RegisterResponder("POST", common.CreateDataModel, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("POST", CreateDataModel, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
 		// Test
-		dataModelInput := common.DataModelCreateRequest{
+		dataModelInput := DataModelCreateRequest{
 			Title: "NewModel",
 		}
 		result, err := dataModelImpl.Create(dataModelInput)
@@ -357,11 +356,11 @@ func TestDataModelSuite(t *testing.T) {
 			resp.Header.Set("Content-Type", "application/json")
 			return resp, nil
 		}
-		httpmock.RegisterResponder("PUT", common.UpdateDataModel, responder)
+		httpmock.RegisterResponder("PUT", UpdateDataModel, responder)
 
 		// Test
 		id := int64(2)
-		dataModelInput := common.DataModelUpdateRequest{
+		dataModelInput := DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
@@ -377,10 +376,10 @@ func TestDataModelSuite(t *testing.T) {
 
 		// Set up mock response
 		responder := httpmock.NewStringResponder(400, `{"error": "Failed to delete ACL"}`)
-		httpmock.RegisterResponder("PUT", common.UpdateDataModel, responder)
+		httpmock.RegisterResponder("PUT", UpdateDataModel, responder)
 
 		id := int64(2)
-		dataModelInput := common.DataModelUpdateRequest{
+		dataModelInput := DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
@@ -395,13 +394,13 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.Reset()
 
 		// Simulate a client-side error
-		httpmock.RegisterResponder("PUT", common.UpdateDataModel, func(req *http.Request) (*http.Response, error) {
+		httpmock.RegisterResponder("PUT", UpdateDataModel, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
 
 		// Test
 		id := int64(2)
-		dataModelInput := common.DataModelUpdateRequest{
+		dataModelInput := DataModelUpdateRequest{
 			Title: "UpdatedModel",
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)

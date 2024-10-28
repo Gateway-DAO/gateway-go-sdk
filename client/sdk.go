@@ -1,22 +1,15 @@
-package pkg
+package client
 
 import (
-	"github.com/Gateway-DAO/gateway-go-sdk/client/accounts"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/auth"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
-	dataassets "github.com/Gateway-DAO/gateway-go-sdk/client/data_assets"
-	datamodels "github.com/Gateway-DAO/gateway-go-sdk/client/data_models"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/helpers"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/services"
 	"github.com/go-resty/resty/v2"
 )
 
 type SDK struct {
-	DataAssets dataassets.DataAsset
-	DataModel  datamodels.DataModel
-	Account    *accounts.AccountsImpl
-	ACL        dataassets.ACL
-	Auth       auth.Auth
+	DataAssets DataAsset
+	DataModel  DataModel
+	Account    *AccountsImpl
+	ACL        ACL
+	Auth       Auth
 }
 
 type SDKConfig struct {
@@ -27,7 +20,7 @@ type SDKConfig struct {
 
 type WalletDetails struct {
 	PrivateKey string
-	WalletType services.WalletTypeEnum
+	WalletType WalletTypeEnum
 }
 
 func NewSDK(config SDKConfig) *SDK {
@@ -41,24 +34,24 @@ func NewSDK(config SDKConfig) *SDK {
 	if config.ApiKey != "" {
 		client.SetAuthToken(config.ApiKey)
 	} else {
-		wallet, _ := services.NewWalletService(config.WalletDetails.PrivateKey, config.WalletDetails.WalletType)
-		params := services.MiddlewareParams{
+		wallet, _ := NewWalletService(config.WalletDetails.PrivateKey, config.WalletDetails.WalletType)
+		params := MiddlewareParams{
 			Client: client,
 			Wallet: *wallet,
 		}
-		client.OnBeforeRequest(helpers.AuthMiddleware(params))
+		client.OnBeforeRequest(AuthMiddleware(params))
 	}
 
-	sdkClient := common.SDKConfig{
+	sdkClient := Config{
 		Client: client,
 	}
 
 	return &SDK{
-		DataAssets: dataassets.NewDataAssetImpl(sdkClient),
-		DataModel:  datamodels.NewDataModelImpl(sdkClient),
-		Auth:       auth.NewAuthImpl(sdkClient),
-		ACL:        dataassets.NewACLImpl(sdkClient),
-		Account:    accounts.NewAccountsImpl(sdkClient),
+		DataAssets: NewDataAssetImpl(sdkClient),
+		DataModel:  NewDataModelImpl(sdkClient),
+		Auth:       NewAuthImpl(sdkClient),
+		ACL:        NewACLImpl(sdkClient),
+		Account:    NewAccountsImpl(sdkClient),
 	}
 }
 
@@ -82,7 +75,7 @@ func NewSDK(config SDKConfig) *SDK {
 // 		client.OnBeforeRequest(helpers.AuthMiddleware(params))
 // 	}
 
-// 	sdkClient := common.SDKConfig{
+// 	sdkClient :=  SDKConfig{
 // 		Client: client,
 // 	}
 

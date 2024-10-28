@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Gateway-DAO/gateway-go-sdk/client"
 	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
 func ExampleGetAllDataModels(sdk *client.SDK) {
@@ -38,7 +38,7 @@ func ExampleGetByIDDataModel(sdk *client.SDK) {
 }
 
 func ExampleCreateDataModel(sdk *client.SDK) {
-	dataModelInput := common.DataModelCreateRequest{
+	dataModelInput := DataModelCreateRequest{
 		Title:       "New Data Model",
 		Description: "A description of the new data model",
 	}
@@ -51,7 +51,7 @@ func ExampleCreateDataModel(sdk *client.SDK) {
 
 func ExampleUpdateDataModel(sdk *client.SDK) {
 	id := int64(1)
-	dataModelUpdate := common.DataModelUpdateRequest{
+	dataModelUpdate := DataModelUpdateRequest{
 		Title:       "Updated Data Model Title",
 		Description: "Updated description of the data model",
 	}

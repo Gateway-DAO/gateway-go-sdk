@@ -1,4 +1,4 @@
-package services
+package client
 
 import (
 	"fmt"
@@ -13,11 +13,6 @@ const (
 	Solana   WalletTypeEnum = "solana"
 	Sui      WalletTypeEnum = "sui"
 )
-
-type WalletSignMessageType struct {
-	Signature  string
-	SigningKey string
-}
 
 type Wallet interface {
 	SignMessage(message string) (WalletSignMessageType, error)

@@ -1,12 +1,9 @@
-package helpers
+package client
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/client/auth"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
-	"github.com/Gateway-DAO/gateway-go-sdk/client/services"
 	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -27,8 +24,8 @@ func CheckJWTTokenExpiration(tokenString string) (bool, error) {
 	return true, nil
 }
 
-func IssueJWT(client resty.Client, wallet services.Wallet) (string, error) {
-	auth := auth.NewAuthImpl(common.SDKConfig{Client: &client})
+func IssueJWT(client resty.Client, wallet Wallet) (string, error) {
+	auth := NewAuthImpl(Config{Client: &client})
 
 	message, messageErr := auth.GetMessage()
 	if messageErr != nil {
@@ -47,10 +44,10 @@ func IssueJWT(client resty.Client, wallet services.Wallet) (string, error) {
 	return jwt, nil
 }
 
-var UNPROTECTED_ROUTES = []string{common.GenerateSignMessage,
-	common.RefreshToken, common.AuthenticateAccount}
+var UNPROTECTED_ROUTES = []string{GenerateSignMessage,
+	RefreshToken, AuthenticateAccount}
 
-func AuthMiddleware(params services.MiddlewareParams) resty.RequestMiddleware {
+func AuthMiddleware(params MiddlewareParams) resty.RequestMiddleware {
 	return func(c *resty.Client, r *resty.Request) error {
 		for _, route := range UNPROTECTED_ROUTES {
 			if route == r.URL {
