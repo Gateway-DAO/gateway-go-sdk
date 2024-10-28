@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/helpers"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/helpers"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/services"
 	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jarcoal/httpmock"

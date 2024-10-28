@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/auth"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/services"
 	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt/v5"
 )

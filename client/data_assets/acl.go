@@ -3,7 +3,7 @@ package dataassets
 import (
 	"errors"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
 )
 
 type ACL interface {

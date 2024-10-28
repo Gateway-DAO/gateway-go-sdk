@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
 )
 
 type FileResponse struct {

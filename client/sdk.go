@@ -1,14 +1,13 @@
 package pkg
 
 import (
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/accounts"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/auth"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
-	dataassets "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_assets"
-	datamodels "github.com/Gateway-DAO/gateway-go-sdk/pkg/data_models"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg/helpers"
-
+	"github.com/Gateway-DAO/gateway-go-sdk/client/accounts"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/auth"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/common"
+	dataassets "github.com/Gateway-DAO/gateway-go-sdk/client/data_assets"
+	datamodels "github.com/Gateway-DAO/gateway-go-sdk/client/data_models"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/helpers"
+	"github.com/Gateway-DAO/gateway-go-sdk/client/services"
 	"github.com/go-resty/resty/v2"
 )
 

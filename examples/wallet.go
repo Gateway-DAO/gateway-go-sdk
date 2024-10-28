@@ -5,10 +5,9 @@ import (
 	"log"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg"
 )
 
-func ExampleAddWallet(sdk *pkg.SDK) {
+func ExampleAddWallet(sdk *client.SDK) {
 
 	address := "0xYourEthereumAddress"
 
@@ -20,7 +19,7 @@ func ExampleAddWallet(sdk *pkg.SDK) {
 	fmt.Println("Added Wallet Account:", myAccount)
 }
 
-func ExampleRemoveWallet(sdk *pkg.SDK) {
+func ExampleRemoveWallet(sdk *client.SDK) {
 
 	address := "0xYourEthereumAddress"
 
@@ -33,7 +32,7 @@ func ExampleRemoveWallet(sdk *pkg.SDK) {
 }
 
 func RunWallet() {
-	sdk := pkg.NewSDK(pkg.SDKConfig{WalletDetails: pkg.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
+	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
 
 	ExampleAddWallet(sdk)
 	ExampleRemoveWallet(sdk)

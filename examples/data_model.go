@@ -5,11 +5,10 @@ import (
 	"log"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
-	"github.com/Gateway-DAO/gateway-go-sdk/pkg"
 	"github.com/Gateway-DAO/gateway-go-sdk/pkg/common"
 )
 
-func ExampleGetAllDataModels(sdk *pkg.SDK) {
+func ExampleGetAllDataModels(sdk *client.SDK) {
 	page := 1
 	pageSize := 10
 	dataModels, err := sdk.DataModel.GetAll(page, pageSize)
@@ -19,7 +18,7 @@ func ExampleGetAllDataModels(sdk *pkg.SDK) {
 	fmt.Printf("Fetched %d data models from GetAll\n", len(dataModels.Data))
 }
 
-func ExampleGetMyDataModels(sdk *pkg.SDK) {
+func ExampleGetMyDataModels(sdk *client.SDK) {
 	page := 1
 	pageSize := 5
 	dataModels, err := sdk.DataModel.GetMy(page, pageSize)
@@ -29,7 +28,7 @@ func ExampleGetMyDataModels(sdk *pkg.SDK) {
 	fmt.Printf("Fetched %d user-specific data models from GetMy\n", len(dataModels.Data))
 }
 
-func ExampleGetByIDDataModel(sdk *pkg.SDK) {
+func ExampleGetByIDDataModel(sdk *client.SDK) {
 	id := int64(1)
 	dataModel, err := sdk.DataModel.GetById(id)
 	if err != nil {
@@ -38,7 +37,7 @@ func ExampleGetByIDDataModel(sdk *pkg.SDK) {
 	fmt.Printf("Fetched data model by ID: %v\n", dataModel)
 }
 
-func ExampleCreateDataModel(sdk *pkg.SDK) {
+func ExampleCreateDataModel(sdk *client.SDK) {
 	dataModelInput := common.DataModelCreateRequest{
 		Title:       "New Data Model",
 		Description: "A description of the new data model",
@@ -50,7 +49,7 @@ func ExampleCreateDataModel(sdk *pkg.SDK) {
 	fmt.Printf("Created data model: %v\n", createdModel)
 }
 
-func ExampleUpdateDataModel(sdk *pkg.SDK) {
+func ExampleUpdateDataModel(sdk *client.SDK) {
 	id := int64(1)
 	dataModelUpdate := common.DataModelUpdateRequest{
 		Title:       "Updated Data Model Title",
@@ -64,7 +63,7 @@ func ExampleUpdateDataModel(sdk *pkg.SDK) {
 }
 
 func RunDataModels() {
-	sdk := pkg.NewSDK(pkg.SDKConfig{WalletDetails: pkg.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
+	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
 
 	ExampleCreateDataModel(sdk)
 	ExampleUpdateDataModel(sdk)
