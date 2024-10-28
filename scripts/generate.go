@@ -56,7 +56,6 @@ func GenerateTypes() {
 }` + "\n\n" + `
 		type SDKConfig struct {
 		Client *resty.Client
-		ApiKey string
 	}
 	` + "\n \n" + `
 		type Error struct {

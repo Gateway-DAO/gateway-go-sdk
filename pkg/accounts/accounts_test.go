@@ -21,7 +21,6 @@ func TestAccountsImpl(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	accountImpl := accounts.NewAccountsImpl(config)

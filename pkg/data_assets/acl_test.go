@@ -21,7 +21,6 @@ func TestACLSuite(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	aclImpl := dataassets.NewACLImpl(config)

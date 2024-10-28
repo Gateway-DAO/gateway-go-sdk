@@ -35,6 +35,15 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 		if !isValid {
 			return "", errors.New("invalid Ethereum signature")
 		}
+	} else if services.ValidateSuiWallet(wallet_address) {
+		isValid, err = services.VerifySuiMessage(message, signature, wallet_address)
+		if err != nil {
+			return "", fmt.Errorf("sui signature verification failed: %v", err)
+		}
+		if !isValid {
+			return "", errors.New("invalid sui signature")
+		}
+
 	} else {
 		isValid, err = services.VerifySolanaMessage(message, signature, wallet_address)
 		if err != nil {
@@ -44,6 +53,7 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 			return "", errors.New("invalid Solana signature")
 		}
 	}
+
 	var jwtTokenResponse common.TokenResponse
 	var error common.Error
 

@@ -22,7 +22,6 @@ func TestDataAssetSuite(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	dataAssetImpl := dataassets.NewDataAssetImpl(config)

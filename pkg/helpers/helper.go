@@ -28,7 +28,7 @@ func CheckJWTTokenExpiration(tokenString string) (bool, error) {
 }
 
 func IssueJWT(client resty.Client, wallet services.Wallet) (string, error) {
-	auth := auth.NewAuthImpl(common.SDKConfig{Client: &client, ApiKey: ""})
+	auth := auth.NewAuthImpl(common.SDKConfig{Client: &client})
 
 	message, messageErr := auth.GetMessage()
 	if messageErr != nil {

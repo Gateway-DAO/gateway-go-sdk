@@ -18,7 +18,6 @@ type SDK struct {
 	Account    *accounts.AccountsImpl
 	ACL        dataassets.ACL
 	Auth       auth.Auth
-	APIKey     string
 }
 
 type SDKConfig struct {
@@ -48,13 +47,11 @@ func NewSDK(config SDKConfig) *SDK {
 			Client: client,
 			Wallet: *wallet,
 		}
-
 		client.OnBeforeRequest(helpers.AuthMiddleware(params))
 	}
 
 	sdkClient := common.SDKConfig{
 		Client: client,
-		ApiKey: "",
 	}
 
 	return &SDK{
@@ -67,12 +64,34 @@ func NewSDK(config SDKConfig) *SDK {
 }
 
 // func (sdk *SDK) Reinitialize(config SDKConfig) {
-// 	sdk.APIKey = config.ApiKey
-
 // 	client := resty.New()
-// 	client.SetBaseURL(sdk.BaseURL)
-// 	if newAPIKey != "" {
-// 		client.SetAuthToken(newAPIKey) /
+
+// 	if config.URL != "" {
+// 		client.SetBaseURL(config.URL)
+// 	} else {
+// 		client.SetBaseURL("https://dev.api.gateway.tech")
 // 	}
 
+// 	if config.ApiKey != "" {
+// 		client.SetAuthToken(config.ApiKey)
+// 	} else {
+// 		wallet, _ := services.NewWalletService(config.WalletDetails.PrivateKey, config.WalletDetails.WalletType)
+// 		params := services.MiddlewareParams{
+// 			Client: client,
+// 			Wallet: *wallet,
+// 		}
+// 		client.OnBeforeRequest(helpers.AuthMiddleware(params))
+// 	}
+
+// 	sdkClient := common.SDKConfig{
+// 		Client: client,
+// 	}
+
+// 	return &SDK{
+// 		DataAssets: dataassets.NewDataAssetImpl(sdkClient),
+// 		DataModel:  datamodels.NewDataModelImpl(sdkClient),
+// 		Auth:       auth.NewAuthImpl(sdkClient),
+// 		ACL:        dataassets.NewACLImpl(sdkClient),
+// 		Account:    accounts.NewAccountsImpl(sdkClient),
+// 	}
 // }

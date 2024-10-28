@@ -20,7 +20,6 @@ func TestWalletImpl(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	walletImpl := accounts.NewWalletImpl(config)

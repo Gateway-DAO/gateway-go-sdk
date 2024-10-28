@@ -20,7 +20,6 @@ func TestAuthSuite(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	authImpl := auth.NewAuthImpl(config)

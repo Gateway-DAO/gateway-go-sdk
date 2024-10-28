@@ -6,7 +6,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
+	"regexp"
+	"strings"
 
 	"github.com/btcsuite/btcutil/bech32"
 	"golang.org/x/crypto/blake2b"
@@ -18,14 +19,19 @@ type SuiService struct {
 }
 
 const (
-	SUI_PRIVATE_KEY_PREFIX = "suiprivkey" // replace with actual prefix
+	SUI_PRIVATE_KEY_PREFIX = "suiprivkey"
 	PRIVATE_KEY_SIZE       = 32
 	SUI_ADDRESS_LENGTH     = 20
 )
 
+type SignaturePubkeyPair struct {
+	SignatureScheme string
+	Signature       []byte
+	PubKey          []byte
+}
+
 var SIGNATURE_FLAG_TO_SCHEME = map[byte]string{
 	0x00: "ED25519",
-	0x01: "Secp256k1",
 }
 
 type ParsedKeypair struct {
@@ -35,12 +41,13 @@ type ParsedKeypair struct {
 
 type SigFlag byte
 
+const SignatureScheme = 3
+
 const (
-	SigFlagEd25519   SigFlag = 0x00
-	SigFlagSecp256k1 SigFlag = 0x01
+	SigFlagEd25519 SigFlag = 0x00
 )
 
-func Ed25519PublicKeyToSuiAddress(pubKey []byte) string {
+func ed25519PublicKeyToSuiAddress(pubKey []byte) string {
 	newPubkey := []byte{byte(SigFlagEd25519)}
 	newPubkey = append(newPubkey, pubKey...)
 
@@ -77,12 +84,10 @@ func fromSecretKey(secretKey []byte) (ed25519.PublicKey, ed25519.PrivateKey, err
 		return nil, nil, fmt.Errorf("wrong secretKey size. Expected %d bytes, got %d", PRIVATE_KEY_SIZE, secretKeyLength)
 	}
 
-	// Generate keypair from seed
 	seed := make([]byte, PRIVATE_KEY_SIZE)
 	copy(seed, secretKey[:PRIVATE_KEY_SIZE])
 	keypair := ed25519.NewKeyFromSeed(seed)
 
-	// Validation
 	signData := []byte("sui validation")
 	signature := ed25519.Sign(keypair, signData)
 	if !ed25519.Verify(keypair.Public().(ed25519.PublicKey), signData, signature) {
@@ -90,6 +95,28 @@ func fromSecretKey(secretKey []byte) (ed25519.PublicKey, ed25519.PrivateKey, err
 	}
 
 	return keypair.Public().(ed25519.PublicKey), keypair, nil
+}
+
+func parseSerializedSignature(serializedSignature string) (*SignaturePubkeyPair, error) {
+	_bytes, err := base64.StdEncoding.DecodeString(serializedSignature)
+	if err != nil {
+		return nil, err
+	}
+
+	signatureScheme := "ED25519"
+	if strings.EqualFold(serializedSignature, "") {
+		return nil, fmt.Errorf("multiSig is not supported")
+	}
+
+	signature := _bytes[1 : len(_bytes)-32]
+	pubKeyBytes := _bytes[1+len(signature):]
+
+	keyPair := &SignaturePubkeyPair{
+		SignatureScheme: signatureScheme,
+		Signature:       signature,
+		PubKey:          pubKeyBytes,
+	}
+	return keyPair, nil
 }
 
 func messageWithIntent(message []byte) []byte {
@@ -108,53 +135,36 @@ func toSerializedSignature(signature []byte, scheme byte, publicKey ed25519.Publ
 	return base64.StdEncoding.EncodeToString(serialized)
 }
 
-const SignatureScheme = 3
-
-func SuiGenerateSignature(privateKey ed25519.PrivateKey, message string) (string, error) {
-	// Prepare message with intent
-	messageBytes := []byte(message)
-	bcsBytes := append([]byte{uint8(len(messageBytes))}, messageBytes...)
-	intentMessage := messageWithIntent(bcsBytes)
-
-	// Hash the message
-	digest := blake2b.Sum256(intentMessage)
-
-	// Sign the message
-	signature := ed25519.Sign(privateKey, digest[:])
-
-	// Serialize signature with scheme and public key
-	return toSerializedSignature(signature, SignatureScheme, privateKey.Public().(ed25519.PublicKey)), nil
+func isHex(value string) bool {
+	match, _ := regexp.MatchString("^(0x|0X)?[a-fA-F0-9]+$", value)
+	return match && len(value)%2 == 0
 }
 
+func getHexByteLength(value string) int {
+	if strings.HasPrefix(value, "0x") || strings.HasPrefix(value, "0X") {
+		return (len(value) - 2) / 2
+	}
+	return len(value) / 2
+}
+
+// Note this is a custom implementation of Sui Wallet in go.
 func NewSuiService(walletPrivateKey string) *SuiService {
-	log.Println(walletPrivateKey)
 	decoded, err := decodeSuiPrivateKey(walletPrivateKey)
 	if err != nil {
 		fmt.Println("Error decoding private key:", err)
 	}
 
-	// Check if schema is ED25519
 	if decoded.Schema != "ED25519" {
 		fmt.Printf("Expected an ED25519 keypair, got %s\n", decoded.Schema)
 	}
 
-	// Create keypair from secret key
 	pub, private, err := fromSecretKey(decoded.SecretKey)
 	if err != nil {
 		fmt.Println("Error creating keypair:", err)
 	}
 
-	message := "hello world"
-
-	signature, err := SuiGenerateSignature(private, message)
-	if err != nil {
-		fmt.Println("Error signing message:", err)
-	}
-	fmt.Println("Signature:", signature)
 	publicKeyHex := hex.EncodeToString(pub)
-	a := Ed25519PublicKeyToSuiAddress(pub)
-	log.Println(a)
-	log.Println(err)
+
 	return &SuiService{
 		walletPrivateKey: private,
 		walletAddress:    publicKeyHex,
@@ -162,50 +172,49 @@ func NewSuiService(walletPrivateKey string) *SuiService {
 }
 
 func (es *SuiService) SignMessage(message string) (WalletSignMessageType, error) {
-	// messageHash := accounts.TextHash([]byte(message))
+	messageBytes := []byte(message)
+	bcsBytes := append([]byte{uint8(len(messageBytes))}, messageBytes...)
+	intentMessage := messageWithIntent(bcsBytes)
 
-	// signature, err := crypto.Sign(messageHash, es.walletPrivateKey)
+	digest := blake2b.Sum256(intentMessage)
 
-	// if err != nil {
-	// 	return WalletSignMessageType{}, fmt.Errorf("failed to sign message: %v", err)
-	// }
+	signature := ed25519.Sign(es.walletPrivateKey, digest[:])
 
-	// if signature[64] < 27 {
-	// 	signature[64] += 27
-	// }
+	serializedSignature := toSerializedSignature(signature, SignatureScheme, es.walletPrivateKey.Public().(ed25519.PublicKey))
 
 	return WalletSignMessageType{
-		Signature:  "",
+		Signature:  serializedSignature,
 		SigningKey: es.walletAddress,
 	}, nil
 }
 
-// func VerifySuiMessage(signature string, message, walletAddress string) (bool, error) {
-// 	signatureHex, err := hexutil.Decode(signature)
-// 	if err != nil {
-// 		return false, err
-// 	}
+func VerifySuiMessage(signature string, message, walletAddress string) (bool, error) {
+	serializedSignature, err := parseSerializedSignature(signature)
+	if err != nil {
+		return false, err
+	}
 
-// 	signatureHex[crypto.RecoveryIDOffset] -= 27
+	messageBytes := []byte(message)
+	bcsBytes := append([]byte{uint8(len(messageBytes))}, messageBytes...)
 
-// 	messageHash := accounts.TextHash([]byte(message))
+	messageBytes = messageWithIntent(bcsBytes)
 
-// 	pubKey, err := crypto.SigToPub(messageHash, signatureHex)
-// 	if err != nil {
-// 		return false, err
-// 	}
+	digest := blake2b.Sum256(messageBytes)
+	pass := ed25519.Verify(serializedSignature.PubKey[:], digest[:], serializedSignature.Signature)
 
-// 	if common.HexToAddress(walletAddress) != crypto.PubkeyToAddress(*pubKey) {
-// 		return false, fmt.Errorf("invalid signature")
-// 	}
+	if !pass {
+		return false, errors.New("signature verification failed")
+	}
 
-// 	return true, nil
-// }
+	derivedAddress := ed25519PublicKeyToSuiAddress(serializedSignature.PubKey)
 
-// func ValidateSuiWallet(wallet string) bool {
-// 	return common.IsHexAddress(wallet)
-// }
+	return strings.EqualFold(derivedAddress, walletAddress), nil
+}
 
-// func (es *SuiService) GetWallet() string {
-// 	return es.walletAddress
-// }
+func ValidateSuiWallet(walletAddress string) bool {
+	return isHex(walletAddress) && getHexByteLength(walletAddress) == SUI_ADDRESS_LENGTH
+}
+
+func (es *SuiService) GetWallet() string {
+	return es.walletAddress
+}

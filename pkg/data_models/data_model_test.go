@@ -21,7 +21,6 @@ func TestDataModelSuite(t *testing.T) {
 
 	config := common.SDKConfig{
 		Client: client,
-		ApiKey: "test-api-key",
 	}
 
 	dataModelImpl := datamodels.NewDataModelImpl(config)
