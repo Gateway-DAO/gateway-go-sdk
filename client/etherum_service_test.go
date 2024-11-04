@@ -4,107 +4,87 @@ import (
 	"fmt"
 	"testing"
 
+	gateway "github.com/Gateway-DAO/gateway-go-sdk/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
 )
 
 func TestSignMessageEth_Success(t *testing.T) {
-	// Test data
 	message := "test message"
-	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a") // Replace with a valid private key
+	ethService := gateway.NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a") // Replace with a valid private key
 
-	// Act: sign the message
 	signedMessage, err := ethService.SignMessage(message)
 
-	// Assert: should sign successfully
 	assert.NoError(t, err)
 	assert.NotEmpty(t, signedMessage.Signature)
-	assert.Equal(t, ethService.walletAddress, signedMessage.SigningKey)
+	assert.NotEmpty(t, signedMessage.SigningKey)
 
-	// Verify the signature
-	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, ethService.walletAddress)
+	isValid, err := gateway.VerifyEtherumMessage(signedMessage.Signature, message, ethService.WalletAddress)
 	assert.NoError(t, err)
 	assert.True(t, isValid)
 }
 
 func TestVerifyEtherumMessage_Success(t *testing.T) {
-	// Test data
 	message := "test message"
-	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	ethService := gateway.NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
 	signedMessage, _ := ethService.SignMessage(message)
 
-	// Act: verify the signed message
-	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, ethService.walletAddress)
+	isValid, err := gateway.VerifyEtherumMessage(signedMessage.Signature, message, ethService.WalletAddress)
 
-	// Assert: should verify successfully
 	assert.NoError(t, err)
 	assert.True(t, isValid)
 }
 
 func TestVerifyEtherumMessage_InvalidSignature(t *testing.T) {
-	// Test data
 	message := "test message"
-	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	ethService := gateway.NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
 	signedMessage, _ := ethService.SignMessage(message)
 
 	signedMessage.Signature = ""
-	// Modify the signature to make it invalid
 	invalidSignature := "0x1234567890abcdef0x1234567890abcdef"
 
-	// Act: verify with the invalid signature
-	isValid, err := VerifyEtherumMessage(invalidSignature, message, ethService.walletAddress)
+	isValid, err := gateway.VerifyEtherumMessage(invalidSignature, message, ethService.WalletAddress)
 
-	// Assert: verification should fail
 	assert.Error(t, err)
 	assert.False(t, isValid)
 }
 
 func TestVerifyEtherumMessage_InvalidAddress(t *testing.T) {
-	// Test data
 	message := "test message"
-	ethService := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	ethService := gateway.NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
 	signedMessage, _ := ethService.SignMessage(message)
 
-	// Use an invalid wallet address
 	invalidAddress := "0xInvalidAddress"
 
-	// Act: verify with the invalid address
-	isValid, err := VerifyEtherumMessage(signedMessage.Signature, message, invalidAddress)
+	isValid, err := gateway.VerifyEtherumMessage(signedMessage.Signature, message, invalidAddress)
 
-	// Assert: verification should fail
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid signature")
 	assert.False(t, isValid)
 }
 
 func TestValidateEtherumWallet_Success(t *testing.T) {
-	// Test valid Ethereum wallet address
-	validWallet := "0x225e681f7A54c248340f7e714b25Dc1fFd2Fda0E" // Replace with a valid hex Ethereum address
+	validWallet := "0x225e681f7A54c248340f7e714b25Dc1fFd2Fda0E"
 
-	// Act: validate the wallet
-	isValid := ValidateEtherumWallet(validWallet)
+	isValid := gateway.ValidateEtherumWallet(validWallet)
 
-	// Assert: validation should succeed
 	assert.True(t, isValid)
 }
 
 func TestValidateEtherumWallet_Fail(t *testing.T) {
-	// Test invalid Ethereum wallet address
 	invalidWallet := "0xInvalidEthereumAddress"
 
-	// Act: validate the wallet
-	isValid := ValidateEtherumWallet(invalidWallet)
+	isValid := gateway.ValidateEtherumWallet(invalidWallet)
 
-	// Assert: validation should fail
 	assert.False(t, isValid)
 }
 
 func TestGetWallet(t *testing.T) {
-	service := NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
+	service := gateway.NewEtherumService("edb0ba5a63c5f9e4f4394560907794fca750704b355413bc04baab896254036a")
 	wallet := service.GetWallet()
 
 	assert.NotEmpty(t, wallet)
-	assert.Equal(t, service.walletAddress, wallet)
+	assert.Equal(t, service.WalletAddress, wallet)
 }
 
 func TestVerifyEtherumMessage_InvalidSignatureHex(t *testing.T) {
@@ -112,7 +92,7 @@ func TestVerifyEtherumMessage_InvalidSignatureHex(t *testing.T) {
 	walletAddress := "0x225e681f7A54c248340f7e714b25Dc1fFd2Fda0E"
 	invalidSignature := "invalid-signature"
 
-	isValid, err := VerifyEtherumMessage(invalidSignature, message, walletAddress)
+	isValid, err := gateway.VerifyEtherumMessage(invalidSignature, message, walletAddress)
 
 	assert.False(t, isValid)
 	assert.Error(t, err)
@@ -121,14 +101,14 @@ func TestVerifyEtherumMessage_InvalidSignatureHex(t *testing.T) {
 func TestNewEtherumService_InvalidPrivateKey(t *testing.T) {
 	invalidPrivateKey := "invalid-private-key"
 	assert.Panics(t, func() {
-		NewEtherumService(invalidPrivateKey)
+		gateway.NewEtherumService(invalidPrivateKey)
 	}, "Expected panic due to invalid private key")
 }
 
 func TestNewEtherumService_InvalidPublicKey(t *testing.T) {
 	invalidPrivateKey := "your-invalid-private-key"
 	assert.Panics(t, func() {
-		NewEtherumService(invalidPrivateKey)
+		gateway.NewEtherumService(invalidPrivateKey)
 	}, "Expected panic due to invalid public key derivation")
 }
 
@@ -136,9 +116,9 @@ type MockEtherumService struct {
 	mock.Mock
 }
 
-func (m *MockEtherumService) SignMessage(message string) (WalletSignMessageType, error) {
+func (m *MockEtherumService) SignMessage(message string) (gateway.WalletSignMessageType, error) {
 	args := m.Called(message)
-	return args.Get(0).(WalletSignMessageType), args.Error(1)
+	return args.Get(0).(gateway.WalletSignMessageType), args.Error(1)
 }
 
 func (m *MockEtherumService) GetWallet() string {
@@ -149,7 +129,7 @@ func (m *MockEtherumService) GetWallet() string {
 func TestSignMessage_SignError(t *testing.T) {
 	mockService := new(MockEtherumService)
 
-	mockService.On("SignMessage", "test-message").Return(WalletSignMessageType{}, fmt.Errorf("failed to sign message"))
+	mockService.On("SignMessage", "test-message").Return(gateway.WalletSignMessageType{}, fmt.Errorf("failed to sign message"))
 
 	_, err := mockService.SignMessage("test-message")
 

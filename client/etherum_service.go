@@ -12,8 +12,8 @@ import (
 )
 
 type EtherumService struct {
-	walletPrivateKey *ecdsa.PrivateKey
-	walletAddress    string
+	WalletPrivateKey *ecdsa.PrivateKey
+	WalletAddress    string
 }
 
 func NewEtherumService(walletPrivateKey string) *EtherumService {
@@ -32,15 +32,15 @@ func NewEtherumService(walletPrivateKey string) *EtherumService {
 	walletAddress := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 
 	return &EtherumService{
-		walletPrivateKey: privateKey,
-		walletAddress:    walletAddress,
+		WalletPrivateKey: privateKey,
+		WalletAddress:    walletAddress,
 	}
 }
 
 func (es *EtherumService) SignMessage(message string) (WalletSignMessageType, error) {
 	messageHash := accounts.TextHash([]byte(message))
 
-	signature, err := crypto.Sign(messageHash, es.walletPrivateKey)
+	signature, err := crypto.Sign(messageHash, es.WalletPrivateKey)
 
 	if err != nil {
 		return WalletSignMessageType{}, fmt.Errorf("failed to sign message: %v", err)
@@ -52,7 +52,7 @@ func (es *EtherumService) SignMessage(message string) (WalletSignMessageType, er
 
 	return WalletSignMessageType{
 		Signature:  hexutil.Encode(signature),
-		SigningKey: es.walletAddress,
+		SigningKey: es.WalletAddress,
 	}, nil
 }
 
@@ -83,5 +83,5 @@ func ValidateEtherumWallet(wallet string) bool {
 }
 
 func (es *EtherumService) GetWallet() string {
-	return es.walletAddress
+	return es.WalletAddress
 }

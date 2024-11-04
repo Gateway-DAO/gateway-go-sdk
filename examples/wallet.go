@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
+	"github.com/Gateway-DAO/gateway-go-sdk/client"
 )
 
 func ExampleAddWallet(sdk *client.SDK) {
@@ -32,7 +32,7 @@ func ExampleRemoveWallet(sdk *client.SDK) {
 }
 
 func RunWallet() {
-	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
+	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: client.Ethereum}})
 
 	ExampleAddWallet(sdk)
 	ExampleRemoveWallet(sdk)

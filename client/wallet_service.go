@@ -19,9 +19,9 @@ type Wallet interface {
 }
 
 type WalletService struct {
-	wallet        Wallet
-	walletType    WalletTypeEnum
-	walletPrivKey string
+	Wallet        Wallet
+	WalletType    WalletTypeEnum
+	WalletPrivKey string
 }
 
 type MiddlewareParams struct {
@@ -44,12 +44,12 @@ func NewWalletService(walletPrivateKey string, walletType WalletTypeEnum) (*Wall
 	}
 
 	return &WalletService{
-		wallet:        wallet,
-		walletType:    walletType,
-		walletPrivKey: walletPrivateKey,
+		Wallet:        wallet,
+		WalletType:    walletType,
+		WalletPrivKey: walletPrivateKey,
 	}, nil
 }
 
 func (ws *WalletService) SignMessage(message string) (WalletSignMessageType, error) {
-	return ws.wallet.SignMessage(message)
+	return ws.Wallet.SignMessage(message)
 }

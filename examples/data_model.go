@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/Gateway-DAO/gateway-go-sdk/client"
-	"github.com/Gateway-DAO/gateway-go-sdk/internal/services"
 )
 
 func ExampleGetAllDataModels(sdk *client.SDK) {
@@ -38,7 +37,7 @@ func ExampleGetByIDDataModel(sdk *client.SDK) {
 }
 
 func ExampleCreateDataModel(sdk *client.SDK) {
-	dataModelInput := DataModelCreateRequest{
+	dataModelInput := client.DataModelCreateRequest{
 		Title:       "New Data Model",
 		Description: "A description of the new data model",
 	}
@@ -51,7 +50,8 @@ func ExampleCreateDataModel(sdk *client.SDK) {
 
 func ExampleUpdateDataModel(sdk *client.SDK) {
 	id := int64(1)
-	dataModelUpdate := DataModelUpdateRequest{
+	
+	dataModelUpdate := client.DataModelUpdateRequest{
 		Title:       "Updated Data Model Title",
 		Description: "Updated description of the data model",
 	}
@@ -63,8 +63,8 @@ func ExampleUpdateDataModel(sdk *client.SDK) {
 }
 
 func RunDataModels() {
-	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
-
+	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: client.Ethereum}})
+	
 	ExampleCreateDataModel(sdk)
 	ExampleUpdateDataModel(sdk)
 	ExampleGetAllDataModels(sdk)

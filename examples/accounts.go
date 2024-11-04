@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	
+	"github.com/Gateway-DAO/gateway-go-sdk/client"
 )
 
 func ExampleLogin(sdk *client.SDK) {
@@ -42,7 +42,7 @@ func ExampleGetRefreshToken(sdk *client.SDK) {
 }
 
 func RunAccounts() {
-	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: services.Ethereum}})
+	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: client.Ethereum}})
 
 	ExampleLogin(sdk)
 	ExampleGetMessage(sdk)
