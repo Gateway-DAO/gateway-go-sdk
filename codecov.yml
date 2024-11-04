@@ -1,4 +1,4 @@
 ignore:
   - "scripts"
   - "examples"
-  - "internal/services/sui_service.go"
+  - "client/sui_service.go"
