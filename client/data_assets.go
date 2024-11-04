@@ -247,7 +247,7 @@ func (u *DataAssetImpl) Share(id int64, shareDetails []ShareDataAssetRequest) ([
 }
 
 func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
-	resp, err := u.Config.Client.R().
+	resp, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%v", id)).
 		SetOutput("temporary-file").
 		Get(DownloadDataAssetByID)
 

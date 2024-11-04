@@ -41,7 +41,7 @@ func (u *AuthImpl) Login(message string, signature string, wallet_address string
 			return "", errors.New("invalid sui signature")
 		}
 
-	} else {
+	} else if ValidateSolanaWallet(wallet_address) {
 		isValid, err = VerifySolanaMessage(message, signature, wallet_address)
 		if err != nil {
 			return "", fmt.Errorf("solana signature verification failed: %v", err)

@@ -163,7 +163,7 @@ func NewSuiService(walletPrivateKey string) *SuiService {
 		fmt.Println("Error creating keypair:", err)
 	}
 
-	publicKeyHex := hex.EncodeToString(pub)
+	publicKeyHex := ed25519PublicKeyToSuiAddress(pub)
 
 	return &SuiService{
 		walletPrivateKey: private,
