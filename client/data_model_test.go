@@ -312,8 +312,9 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", gateway.UpdateDataModel, responder)
 
 		id := int64(2)
+		var title = "UpdatedModel"
 		dataModelInput := gateway.DataModelUpdateRequest{
-			Title: "UpdatedModel",
+			Title: &title,
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
 
@@ -328,8 +329,10 @@ func TestDataModelSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", gateway.UpdateDataModel, responder)
 
 		id := int64(2)
+		var title = "UpdatedModel"
+
 		dataModelInput := gateway.DataModelUpdateRequest{
-			Title: "UpdatedModel",
+			Title: &title,
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
 
@@ -345,8 +348,10 @@ func TestDataModelSuite(t *testing.T) {
 		})
 
 		id := int64(2)
+		var title = "UpdatedModel"
+
 		dataModelInput := gateway.DataModelUpdateRequest{
-			Title: "UpdatedModel",
+			Title: &title,
 		}
 		result, err := dataModelImpl.Update(id, dataModelInput)
 

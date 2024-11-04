@@ -185,9 +185,9 @@ func TestDataAssetSuite(t *testing.T) {
 			return resp, nil
 		}
 		httpmock.RegisterResponder("PUT", "/data-assets/1", responder)
-
+		var name = "New Asset"
 		input := gateway.UpdateDataAssetRequest{
-			Name: "New Asset",
+			Name: &name,
 		}
 		result, err := dataAssetImpl.UpdateAsset("1", input)
 
@@ -202,8 +202,9 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", gateway.UpdateDataAssetByID,
 			httpmock.NewStringResponder(500, fixture))
 
+		var name = "New Asset"
 		input := gateway.UpdateDataAssetRequest{
-			Name: "New Asset",
+			Name: &name,
 		}
 		asset, err := dataAssetImpl.UpdateAsset("1", input)
 
@@ -217,8 +218,9 @@ func TestDataAssetSuite(t *testing.T) {
 		httpmock.RegisterResponder("PUT", gateway.UpdateDataAssetByID,
 			httpmock.NewErrorResponder(errors.New("http request error")))
 
+		var name = "New Asset"
 		input := gateway.UpdateDataAssetRequest{
-			Name: "New Asset",
+			Name: &name,
 		}
 		asset, err := dataAssetImpl.UpdateAsset("1", input)
 
@@ -337,8 +339,8 @@ func TestDataAssetSuite(t *testing.T) {
 
 		message, err := dataAssetImpl.DeleteAsset(1)
 
-		assert.Error(t, err)     
-		assert.Empty(t, message) 
+		assert.Error(t, err)
+		assert.Empty(t, message)
 	})
 
 	t.Run("TestUploadFileSuccess", func(t *testing.T) {

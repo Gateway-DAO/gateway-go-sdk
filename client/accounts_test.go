@@ -133,8 +133,9 @@ func TestAccountsImpl(t *testing.T) {
 		}
 		httpmock.RegisterResponder("PATCH", gateway.GetMyAccount, responder)
 
+		var pic = "test"
 		updateDetails := gateway.AccountUpdateRequest{
-			ProfilePicture: "test",
+			ProfilePicture: &pic,
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)
 
@@ -148,8 +149,9 @@ func TestAccountsImpl(t *testing.T) {
 		errorResponse := `{"error": "Failed to update account"}`
 		httpmock.RegisterResponder("PATCH", gateway.GetMyAccount, httpmock.NewStringResponder(400, errorResponse))
 
+		var pic = "test"
 		updateDetails := gateway.AccountUpdateRequest{
-			ProfilePicture: "test",
+			ProfilePicture: &pic,
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)
 
@@ -163,9 +165,9 @@ func TestAccountsImpl(t *testing.T) {
 		httpmock.RegisterResponder("PATCH", gateway.GetMyAccount, func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("client-side error")
 		})
-
+		var pic = "test"
 		updateDetails := gateway.AccountUpdateRequest{
-			ProfilePicture: "test",
+			ProfilePicture: &pic,
 		}
 		myAccount, err := accountImpl.UpdateMe(updateDetails)
 

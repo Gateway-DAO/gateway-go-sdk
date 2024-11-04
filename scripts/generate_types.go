@@ -12,7 +12,7 @@ func extractGoTypes(schema SwaggerSchema) []string {
 		if len(def.Enum) > 0 {
 			goTypes = append(goTypes, generateEnum(defName, def.Enum, def.XEnumVarnames))
 		} else if def.Type == "object" {
-			generatedObject := generateStruct(defName, def.Properties)
+			generatedObject := generateStruct(defName, def.Properties, def.Required)
 			if defName == "helper.PaginatedResponse" {
 				generatedObject = addGenericsToStruct(generatedObject)
 			}
@@ -52,12 +52,20 @@ func generateEnum(name string, enumValues []string, varNames []string) string {
 	return strings.Join(lines, "\n")
 }
 
-func generateStruct(name string, properties map[string]SwaggerType) string {
+func generateStruct(name string, properties map[string]SwaggerType, required []string) string {
 	var fields []string
 	fields = append(fields, fmt.Sprintf("type %s struct {", ToPascalCase(name)))
 
+	requiredSet := make(map[string]struct{})
+	for _, field := range required {
+		requiredSet[field] = struct{}{}
+	}
+
 	for propName, propSchema := range properties {
 		goType := getGoType(propSchema)
+		if _, isRequired := requiredSet[propName]; !isRequired {
+			goType = "*" + goType // Use pointer for optional fields
+		}
 		fields = append(fields, fmt.Sprintf("\t%s %s `json:\"%s\"`", ToPascalCase(propName), goType, propName))
 	}
 

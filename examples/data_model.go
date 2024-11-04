@@ -50,10 +50,11 @@ func ExampleCreateDataModel(sdk *client.SDK) {
 
 func ExampleUpdateDataModel(sdk *client.SDK) {
 	id := int64(1)
-	
+	var title = "Updated title"
+	var desc = "updated description"
 	dataModelUpdate := client.DataModelUpdateRequest{
-		Title:       "Updated Data Model Title",
-		Description: "Updated description of the data model",
+		Title:       &title,
+		Description: &desc,
 	}
 	updatedModel, err := sdk.DataModel.Update(id, dataModelUpdate)
 	if err != nil {
@@ -64,7 +65,7 @@ func ExampleUpdateDataModel(sdk *client.SDK) {
 
 func RunDataModels() {
 	sdk := client.NewSDK(client.SDKConfig{WalletDetails: client.WalletDetails{PrivateKey: "", WalletType: client.Ethereum}})
-	
+
 	ExampleCreateDataModel(sdk)
 	ExampleUpdateDataModel(sdk)
 	ExampleGetAllDataModels(sdk)
