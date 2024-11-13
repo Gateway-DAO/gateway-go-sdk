@@ -247,6 +247,9 @@ func (u *DataAssetImpl) Share(id int64, shareDetails []ShareDataAssetRequest) ([
 }
 
 func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
+
+	dataAsset, _ := u.Get(id)
+
 	resp, err := u.Config.Client.R().SetPathParam("id", fmt.Sprintf("%v", id)).
 		SetOutput("temporary-file").
 		Get(DownloadDataAssetByID)
@@ -255,14 +258,9 @@ func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
 		return nil, fmt.Errorf("failed to download file: %w", err)
 	}
 
-	contentDisposition := resp.Header().Get("Content-Disposition")
-	var fileName string
-	if contentDisposition != "" {
-		_, params, err := mime.ParseMediaType(contentDisposition)
-		if err == nil {
-			fileName = params["filename"]
-		}
-	}
+	var fileName = dataAsset.Name
+
+	mediaType, _, err := mime.ParseMediaType(dataAsset.Type)
 
 	if fileName == "" {
 		fileName = filepath.Base(resp.Request.URL)
@@ -275,12 +273,10 @@ func (u *DataAssetImpl) Download(id int64) (*FileResponse, error) {
 
 	defer os.Remove("temporary-file")
 
-	fileType := filepath.Ext(fileName)
-
 	return &FileResponse{
 		FileName:    fileName,
 		FileContent: fileContent,
-		FileType:    fileType,
+		FileType:    mediaType,
 	}, nil
 
 }
